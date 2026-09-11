@@ -184,6 +184,7 @@
   <!-- 主操作 -->
   <div class="hero" data-page-node-id="Gbn0U8JtHLSMnPWQhK263B">
     <button class="btn btn-primary" data-goto="collect" data-page-node-id="okC8Vnj5Caas82EvWiZmZE"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="KXbR92RUFF9A9jioiSbVSV"><circle cx="11" cy="11" r="7" data-page-node-id="vTsBUHdXFumQgI1yVeYiMP"/><path d="M21 21l-4.3-4.3" data-page-node-id="bZEtDiKOMldxwDC3zeSiSD"/></svg>开始搜索</button>
+    <button class="btn btn-primary" id="btnManualAdd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>手动添加</button>
     <button class="btn btn-dark" data-goto="candidate" data-page-node-id="ITOwx46T2g4jOQXtZndAJy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="alrFhdoVLlgsJe0uzJoYCb"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" data-page-node-id="uJ5fKHwA3bJgYYdruP0QNe"/></svg>查看候选</button>
   </div>
 
@@ -228,6 +229,29 @@
       <button class="btn" id="modalCancel" data-page-node-id="kUWHDKIMKsDctQ5PB3qE7c">取消</button>
       <button class="btn btn-primary" id="modalOk" data-page-node-id="hfk9DKLrxrpss40yWIeOIf">确认</button>
     </div>
+  </div>
+</div>
+
+<!-- 手动添加视频弹窗 -->
+<div class="modal-mask" id="manualMask">
+  <div class="modal">
+    <h4>手动添加视频</h4>
+    <p>只填抖音链接即可保存；其余信息可后续补充。</p>
+    <div class="form-grid">
+      <div class="full"><label>抖音链接（必填）</label><input id="m_link" placeholder="https://www.douyin.com/video/..." inputmode="url"></div>
+      <div class="full"><label>标题</label><input id="m_title" placeholder="留空时显示为“待补充标题”"></div>
+      <div><label>作者</label><input id="m_author" placeholder="留空时显示为“未知”"></div>
+      <div><label>发布时间</label><input id="m_publishTime" placeholder="2026-09-10 12:00"></div>
+      <div><label>粉丝数</label><input id="m_fans" type="number"></div>
+      <div><label>点赞数</label><input id="m_likes" type="number"></div>
+      <div><label>评论数</label><input id="m_comments" type="number"></div>
+      <div><label>收藏数</label><input id="m_favorites" type="number"></div>
+      <div><label>分享数</label><input id="m_shares" type="number"></div>
+      <div><label>内容类型</label><select id="m_contentType"><option value="">未知</option><option>真人口播</option><option>人物加屏幕</option><option>配音讲解</option><option>剧情</option><option>其他</option></select></div>
+      <div><label>分类</label><select id="m_topic"><option value="">未分类</option><option>AI教程</option><option>AI工具实操</option><option>AI工作流</option><option>提示词与智能体教学</option><option>AI与普通人</option><option>AI未来发展</option><option>AI与职业就业</option><option>AI概念科普</option><option>普通人用AI</option><option>AI机会与焦虑</option></select></div>
+      <div class="full"><label>备注</label><textarea id="m_note"></textarea></div>
+    </div>
+    <div class="row"><button class="btn" id="manualCancel">取消</button><button class="btn btn-primary" id="manualSave">保存到今日候选</button></div>
   </div>
 </div>
 
@@ -470,8 +494,20 @@ function esc(s){
 }
 function canonLink(link){
   if(!link) return '';
-  var m = String(link).match(/(video|shipin)\/(\d+)/);
-  return m ? m[1] + '/' + m[2] : String(link).trim();
+  var text = String(link).trim();
+  var m = text.match(/(?:video|shipin)\/(\d+)/i);
+  if(m) return 'douyin/' + m[1];
+  return text.replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
+}
+function isDouyinVideoLink(link){
+  var text = String(link || '').trim();
+  if(!text) return false;
+  try{
+    var url = new URL(text);
+    var host = url.hostname.toLowerCase();
+    if(host === 'v.douyin.com' || host.endsWith('.v.douyin.com')) return true;
+    return (host === 'douyin.com' || host.endsWith('.douyin.com')) && /^\/(video|shipin)\/[^/]+/i.test(url.pathname);
+  }catch(e){ return false; }
 }
 
 /* =========================================================
@@ -479,6 +515,7 @@ function canonLink(link){
  * ========================================================= */
 function seedReal(){
   return [
+    { id:'manual_qujingkuang_7644747603825199150', title:'学AI，千万别错过这5个博主！', link:'https://www.douyin.com/shipin/7644747603825199150', author:'取景框看世界', publishTime:'2026-05-28 09:25', duration:null, fans:1688000, likes:39000, comments:249, favorites:23000, shares:4051, approx:null, contentType:'真人口播', topic:'AI教程', status:'candidate', manualOverride:true, overrideReason:'发布时间较早，但由用户手动收藏作为口播参考保留。', reason:'人工手动收藏保留：发布时间较早，仍作为口播参考。', note:'', transcript:'', analysis:null, isSample:false, collectedBy:'manual', createdAt:nowStr(), updatedAt:nowStr() },
     { id:'real_tk_koubo_7682771718289650938', title:'90%的人用 AI 做口播，死在这一步', link:'https://www.douyin.com/video/7682771718289650938', author:'TK科技测评', publishTime:'2026-09-07 20:38', duration:'2分45秒', fans:2867000, likes:20053, comments:386, favorites:343, shares:30, approx:{fans:true, likes:false, comments:false, favorites:false, shares:false}, contentType:'配音讲解', topic:'AI工作流', status:'candidate', manualOverride:false, overrideReason:'', reason:'内容适合参考/改编成口播为主：痛点开场并完整讲工作台抓选题、拆结构、生成新钩子与分镜的流程；互动数据为加分。', note:'', transcript:'', analysis:{score:96, adaptable:'适合', scoreReason:'痛点开场，完整讲工作台抓选题、拆结构、生成新钩子与分镜的流程，适合改成口播。'}, isSample:false, collectedBy:'real', createdAt:nowStr(), updatedAt:nowStr() },
     { id:'real_weiji_7682463704775970075', title:'GPT6给我剪出一条万赞爆款', link:'https://www.douyin.com/video/7682463704775970075', author:'未济', publishTime:'2026-09-07 12:05', duration:'2分11秒', fans:11000, likes:12321, comments:199, favorites:10098, shares:2736, approx:{fans:true, likes:false, comments:false, favorites:false, shares:false}, contentType:'真人口播', topic:'AI工作流', status:'candidate', manualOverride:false, overrideReason:'', reason:'内容适合参考/改编成口播为主：AI自动剪辑工作流案例明确、流程感强；真人口播、低粉高赞与评论活跃为加分。', note:'', transcript:'', analysis:{score:94, adaptable:'适合', scoreReason:'AI自动剪辑工作流，案例明确、流程感强，适合真人口播。'}, isSample:false, collectedBy:'real', createdAt:nowStr(), updatedAt:nowStr() },
     { id:'real_xiaowei_7682815272499978993', title:'蒸馏就是AI时代的合法抢劫', link:'https://www.douyin.com/video/7682815272499978993', author:'小魏开窍了', publishTime:'2026-09-07 23:27', duration:'1分40秒', fans:45000, likes:8330, comments:351, favorites:8193, shares:2039, approx:{fans:true, likes:false, comments:false, favorites:false, shares:false}, contentType:'真人口播', topic:'AI概念科普', status:'candidate', manualOverride:false, overrideReason:'', reason:'内容适合参考/改编成口播为主：概念类强钩子，适合改编为AI认知口播，但表述需核实；真人口播、低粉高赞与评论活跃为加分。', note:'', transcript:'', analysis:{score:92, adaptable:'适合', scoreReason:'概念类强钩子，适合改编为AI认知口播，但表述需核实。'}, isSample:false, collectedBy:'real', createdAt:nowStr(), updatedAt:nowStr() },
@@ -532,11 +569,13 @@ function loadData(){
   }catch(e){ state.videos = null; state.logs = []; }
   if(state.videos === null){
     state.videos = seedReal().concat(seedDemo());
-    addLog('首次打开：已载入 4 条真实采集记录 + 5 条演示（模拟）记录，演示模式默认关闭','info');
+    addLog('首次打开：已载入 4 条真实采集记录、1 条手动收藏记录 + 5 条演示（模拟）记录，演示模式默认关闭','info');
   }
   var existingIds = {};
   state.videos.forEach(function(v){ existingIds[v.id] = true; });
-  var missingSeeds = seedReal().filter(function(v){ return !existingIds[v.id]; });
+  var existingLinks = {};
+  state.videos.forEach(function(v){ var link = canonLink(v.link); if(link) existingLinks[link] = true; });
+  var missingSeeds = seedReal().filter(function(v){ return !existingIds[v.id] && !existingLinks[canonLink(v.link)]; });
   if(missingSeeds.length){
     state.videos = state.videos.concat(missingSeeds);
     saveData();
@@ -599,7 +638,8 @@ function renderToday(){
     if(v.status === 'review'){
       items.push({ v:v, tag:'<span class="tag tag-review">待复核</span>', tab:'review' });
     }else if(v.status === 'candidate'){
-      if(h !== null && h > HARD.urgentHours) items.push({ v:v, tag:'<span class="tag tag-overdue">临期 · 发布'+Math.floor(h/24)+'天</span>', tab:'candidate' });
+      if(v.collectedBy === 'manual' && v.manualOverride) items.push({ v:v, tag:'<span class="tag tag-review">人工收藏</span>', tab:'candidate' });
+      else if(h !== null && h > HARD.urgentHours) items.push({ v:v, tag:'<span class="tag tag-overdue">临期 · 发布'+Math.floor(h/24)+'天</span>', tab:'candidate' });
       else items.push({ v:v, tag:'<span class="tag tag-new">今日候选</span>', tab:'candidate' });
     }else if(v.status === 'selected' && isExpired(v)){
       items.push({ v:v, tag:'<span class="tag tag-overdue">入选已过期</span>', tab:'selected' });
@@ -620,6 +660,7 @@ function chipHtml(v, chk){
   var chips = '';
   if(v.isSample) chips += '<span class="chip sample-chip">模拟数据</span>';
   if(v.collectedBy === 'real') chips += '<span class="chip real">真实采集</span>';
+  if(v.collectedBy === 'manual') chips += '<span class="chip override">手动添加</span>';
   if(v.contentType) chips += '<span class="chip type">'+esc(v.contentType)+'</span>';
   chips += '<span class="chip topic">'+esc(v.topic||'未分类')+'</span>';
   if(TEACHING_TOPICS.indexOf(v.topic) >= 0) chips += '<span class="chip pass">AI教学类 · 主采集</span>';
@@ -650,7 +691,7 @@ function cardHtml(v, actions){
   if(chk.fails.length) detail.push('<b>未通过基础条件：</b>'+esc(chk.fails.join('；')));
   if(chk.reviews.length) detail.push('<b>待确认：</b>'+esc(chk.reviews.join('；')));
   if(v.manualOverride) detail.push('<b>人工例外理由：</b>'+esc(v.overrideReason||'—'));
-  return '<div class="vcard'+(isExpired(v)&&v.status!=='rejected'?' expired':'')+(v.isSample?' sample':'')+'" data-id="'+esc(v.id)+'">'
+  return '<div class="vcard'+(isExpired(v)&&v.status!=='rejected'&&!v.manualOverride?' expired':'')+(v.isSample?' sample':'')+'" data-id="'+esc(v.id)+'">'
     + '<div class="head"><div class="title">'+linkHtml+'</div>'
     + (score !== null ? '<div class="score-pill"><b>'+score+'</b><span>可借鉴</span></div>' : '')
     + '</div>'
@@ -697,11 +738,11 @@ function commonActions(v, primary){
 
 function renderCandidate(){
   var all = statusVideos('candidate');
-  var valid = all.filter(function(v){ return !isExpired(v); });
-  var expired = all.filter(function(v){ return isExpired(v); });
+  var valid = all.filter(function(v){ return !isExpired(v) || v.manualOverride; });
+  var expired = all.filter(function(v){ return isExpired(v) && !v.manualOverride; });
   var list = applyQuerySort(valid);
   var h = '<div class="panel"><h3><svg viewBox="0 0 24 24" fill="none" stroke="#fe2c55" stroke-width="2"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>今日候选 · 有效候选 '+valid.length+' 条</h3>'
-    + '<p class="tip">每次打开自动重检336小时时效；超过288小时（12天）标记临期，过期记录不进有效候选。综合排序：内容是否适合参考/改编成口播 &gt; 真人口播 &gt; 低粉高赞 &gt; 评论活跃；AI教学/AI认知仅作分类。</p>'
+    + '<p class="tip">每次打开自动重检336小时时效；超过288小时（12天）标记临期，普通采集记录过期后不进有效候选；你手动添加并收藏的记录会继续保留。综合排序：内容是否适合参考/改编成口播 &gt; 真人口播 &gt; 低粉高赞 &gt; 评论活跃；AI教学/AI认知仅作分类。</p>'
     + '<p class="tip">提示：抖音网页版对部分视频限制「仅在 App 内观看」，浏览器打开若提示出错或看不到视频，请点「复制链接」粘贴到抖音 App 打开，或直接在抖音搜索作者名。</p></div>';
   h += filterbarHtml();
   if(!list.length) h += emptyHtml('暂无有效候选。点「开始搜索」发起采集任务，或调整搜索条件。');
@@ -844,7 +885,7 @@ function renderLogs(){
 }
 
 function renderCounts(){
-  document.getElementById('cntCandidate').textContent = statusVideos('candidate').filter(function(v){return !isExpired(v);}).length;
+  document.getElementById('cntCandidate').textContent = statusVideos('candidate').filter(function(v){return !isExpired(v) || v.manualOverride;}).length;
   document.getElementById('cntReview').textContent = statusVideos('review').length;
   document.getElementById('cntSelected').textContent = statusVideos('selected').length;
   document.getElementById('cntRejected').textContent = statusVideos('rejected').length;
@@ -1051,6 +1092,49 @@ function numOrNull(id){
   var n = parseInt(s, 10);
   return isNaN(n) ? null : n;
 }
+function openManualAdd(){
+  ['m_link','m_title','m_author','m_publishTime','m_fans','m_likes','m_comments','m_favorites','m_shares','m_note'].forEach(function(id){ document.getElementById(id).value = ''; });
+  document.getElementById('m_contentType').value = '';
+  document.getElementById('m_topic').value = '';
+  document.getElementById('manualMask').classList.add('show');
+  setTimeout(function(){ document.getElementById('m_link').focus(); }, 0);
+}
+function saveManualVideo(){
+  var link = document.getElementById('m_link').value.trim();
+  if(!isDouyinVideoLink(link)){
+    toast('请输入 douyin.com/video、douyin.com/shipin 或 v.douyin.com 链接', true);
+    return;
+  }
+  var existing = state.videos.filter(function(v){ return canonLink(v.link) === canonLink(link); })[0];
+  if(existing){
+    document.getElementById('manualMask').classList.remove('show');
+    openEdit(existing.id);
+    toast('该链接已存在，已打开已有记录供编辑', true);
+    return;
+  }
+  var v = rawToVideo({
+    link:link,
+    title:document.getElementById('m_title').value.trim() || '待补充标题',
+    author:document.getElementById('m_author').value.trim() || '未知',
+    publishTime:document.getElementById('m_publishTime').value.trim() || null,
+    fans:numOrNull('m_fans'), likes:numOrNull('m_likes'), comments:numOrNull('m_comments'),
+    favorites:numOrNull('m_favorites'), shares:numOrNull('m_shares'),
+    contentType:document.getElementById('m_contentType').value || null,
+    topic:document.getElementById('m_topic').value || null,
+    note:document.getElementById('m_note').value.trim(), collectedBy:'manual'
+  });
+  v.status = 'candidate';
+  v.manualOverride = true;
+  v.overrideReason = '用户手动添加，作为人工收藏保留。';
+  v.reason = '手动添加：作为人工收藏保留，可后续补充数据。';
+  state.videos.push(v);
+  document.getElementById('manualMask').classList.remove('show');
+  state.tab = 'candidate';
+  document.querySelectorAll('.tab').forEach(function(x){ x.classList.toggle('active', x.dataset.tab === 'candidate'); });
+  addLog('手动添加「'+v.title.slice(0,20)+'」并保留在今日候选','ok');
+  saveData(); refreshAll();
+  toast('已添加到今日候选');
+}
 
 /* =========================================================
  * 事件绑定
@@ -1074,6 +1158,9 @@ document.getElementById('demoSwitch').addEventListener('click', function(){
   saveData(); refreshAll();
   toast(state.demoMode ? '演示模式已开启' : '演示模式已关闭，仅显示真实数据');
 });
+document.getElementById('btnManualAdd').addEventListener('click', openManualAdd);
+document.getElementById('manualCancel').addEventListener('click', function(){ document.getElementById('manualMask').classList.remove('show'); });
+document.getElementById('manualSave').addEventListener('click', saveManualVideo);
 
 $panel.addEventListener('click', function(e){
   var btn = e.target.closest('[data-action]'); if(!btn) return;
