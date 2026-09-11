@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<!-- 抖音AI爆款口播选题工作台 v2 · 数据仅保存于当前浏览器 localStorage，请定期导出备份 -->
+<html lang="zh-CN" data-page-node-id="36mAEpjvGcbHcyi2ZDrk7Y">
+<head data-page-node-id="NkYJwpUVV3nuULMMeqCulq">
+<meta charset="UTF-8" data-page-node-id="lcGXXk4NrWEfkpGclmuTpx">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" data-page-node-id="s2xzWrzKUO5V16WQFInC9s">
+<title>抖音AI爆款口播选题工作台</title>
+<style>
+  :root{
+    --primary:#fe2c55; --primary-dark:#d81e42; --ink:#161823; --sub:#6b7280;
+    --bg:#f5f6f8; --card:#ffffff; --line:#e8eaef; --green:#07c160; --red:#f43f5e;
+    --amber:#f59e0b; --blue:#3b82f6; --purple:#8b5cf6;
+    --radius:14px; --shadow:0 2px 10px rgba(22,24,35,.06);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.6}
+  .wrap{max-width:1080px;margin:0 auto;padding:16px 16px 96px}
+  /* 顶栏 */
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+  .brand{display:flex;align-items:center;gap:10px}
+  .brand svg{width:34px;height:34px}
+  .brand h1{font-size:19px;font-weight:700}
+  .brand .sub{font-size:12px;color:var(--sub)}
+  .top-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .sync-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--sub);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+  .sync-dot{width:8px;height:8px;border-radius:50%;background:var(--green)}
+  .sync-badge.fail .sync-dot{background:var(--red)}
+  .sync-badge.fail{color:var(--red);border-color:#fecdd3}
+  .demo-switch{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--sub);cursor:pointer;user-select:none;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+  .demo-switch .sw{width:32px;height:18px;border-radius:999px;background:#d1d5db;position:relative;transition:.15s;flex:none}
+  .demo-switch .sw::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:.15s}
+  .demo-switch.on .sw{background:var(--amber)}
+  .demo-switch.on .sw::after{left:16px}
+  /* 主操作区 */
+  .hero{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:14px;cursor:pointer;transition:.15s;font-family:inherit;text-decoration:none}
+  .btn:hover{border-color:var(--primary);color:var(--primary)}
+  .btn svg{width:16px;height:16px;flex:none}
+  .btn-primary{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600}
+  .btn-primary:hover{background:var(--primary-dark);color:#fff}
+  .btn-dark{background:var(--ink);border-color:var(--ink);color:#fff;font-weight:600}
+  .btn-dark:hover{background:#000;color:#fff}
+  .btn-danger:hover{border-color:var(--red);color:var(--red)}
+  .btn-sm{min-height:34px;padding:0 12px;font-size:13px;border-radius:8px}
+  .hero .btn{min-height:50px;font-size:15px;padding:0 22px}
+  details.more{margin-bottom:16px}
+  details.more summary{cursor:pointer;font-size:13px;color:var(--sub);list-style:none;display:inline-flex;align-items:center;gap:6px;padding:6px 0}
+  details.more summary::before{content:"▸";font-size:11px}
+  details.more[open] summary::before{content:"▾"}
+  .more-body{display:flex;gap:8px;flex-wrap:wrap;padding-top:8px}
+  /* 今天要处理 */
+  .today-box{background:linear-gradient(135deg,#fff 0%,#fff5f6 100%);border:1px solid #ffd9de;border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:16px}
+  .today-box h2{font-size:16px;display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .today-box h2 .dot{width:9px;height:9px;border-radius:50%;background:var(--primary);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .today-item{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:8px}
+  .today-item .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+  .tag{flex:none;font-size:12px;border-radius:6px;padding:2px 8px;font-weight:600}
+  .tag-overdue{background:#ffe4e6;color:var(--red)}
+  .tag-new{background:#e0f2fe;color:#0369a1}
+  .tag-review{background:#fef3c7;color:#b45309}
+  .today-empty{color:var(--sub);font-size:13px;padding:6px 2px}
+  /* Tab */
+  .tabs{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:5px;margin-bottom:14px;overflow-x:auto}
+  .tab{flex:1;min-width:88px;text-align:center;padding:10px 8px;border-radius:9px;font-size:14px;cursor:pointer;color:var(--sub);white-space:nowrap;border:none;background:transparent;font-family:inherit;min-height:44px}
+  .tab.active{background:var(--ink);color:#fff;font-weight:600}
+  .tab .cnt{display:inline-block;margin-left:4px;font-size:12px;background:rgba(254,44,85,.14);color:var(--primary);border-radius:999px;padding:0 7px}
+  .tab.active .cnt{background:rgba(255,255,255,.22);color:#fff}
+  /* 搜索排序条 */
+  .filterbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .filterbar input,.filterbar select{min-height:40px;border:1px solid var(--line);border-radius:9px;padding:0 12px;font-size:14px;background:#fff;color:var(--ink);font-family:inherit}
+  .filterbar input{flex:1;min-width:160px}
+  .filterbar input:focus,.filterbar select:focus{outline:none;border-color:var(--primary)}
+  /* 卡片 */
+  .vcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:14px}
+  .vcard.expired{opacity:.78;border-style:dashed}
+  .vcard.sample{background:#fffdf5;border-color:#fde68a}
+  .vcard .head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .vcard .title{font-size:16px;font-weight:700;flex:1;min-width:0}
+  .vcard .title a{color:var(--ink);text-decoration:none}
+  .vcard .title a:hover{color:var(--primary)}
+  .vcard .title .nolink{color:var(--sub)}
+  .score-pill{flex:none;text-align:center;background:var(--ink);color:#fff;border-radius:10px;padding:6px 10px;min-width:64px}
+  .score-pill b{font-size:19px;display:block;line-height:1.1}
+  .score-pill span{font-size:11px;opacity:.75}
+  .meta{display:flex;flex-wrap:wrap;gap:6px 14px;margin:10px 0;font-size:13px;color:var(--sub)}
+  .meta b{color:var(--ink);font-weight:600}
+  .meta .missing{color:var(--amber)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+  .chip{font-size:12px;border-radius:6px;padding:3px 9px;background:#f1f2f6;color:var(--sub)}
+  .chip.type{background:#ede9fe;color:var(--purple)}
+  .chip.topic{background:#e0f2fe;color:#0369a1}
+  .chip.pass{background:#dcfce7;color:#15803d}
+  .chip.fail{background:#ffe4e6;color:var(--red)}
+  .chip.warn{background:#fef3c7;color:#b45309}
+  .chip.exp{background:#161823;color:#fff}
+  .chip.sample-chip{background:#fef3c7;color:#92400e}
+  .chip.override{background:#ede9fe;color:#6d28d9}
+  .chip.real{background:#dcfce7;color:#15803d}
+  .reason{font-size:13px;color:var(--sub);background:#fafafa;border-left:3px solid var(--line);padding:8px 10px;border-radius:0 8px 8px 0;margin:8px 0}
+  .reason b{color:var(--ink)}
+  .card-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .note-input{width:100%;min-height:38px;font-size:14px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-top:8px;font-family:inherit;resize:vertical;background:#fff;color:var(--ink)}
+  .note-input:focus{outline:none;border-color:var(--primary)}
+  .updated{font-size:12px;color:#9ca3af;margin-top:8px}
+  .empty-state{text-align:center;color:var(--sub);padding:44px 16px;background:var(--card);border:1px dashed var(--line);border-radius:var(--radius);font-size:14px}
+  /* 面板 */
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:14px}
+  .panel h3{font-size:15px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .panel h3 svg{width:18px;height:18px;flex:none}
+  .panel p.tip{font-size:13px;color:var(--sub);margin-bottom:10px}
+  .kw-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  .kw-row input{flex:1;min-width:200px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font-size:14px;background:#fff;color:var(--ink);font-family:inherit}
+  .kw-row input:focus{outline:none;border-color:var(--primary)}
+  .task-card{background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:14px;margin-top:12px;display:none}
+  .task-card.show{display:block}
+  .task-card h4{font-size:14px;color:#92400e;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .task-card pre{background:#fff;border:1px solid #fde68a;border-radius:8px;padding:10px;font-size:12px;white-space:pre-wrap;word-break:break-all;max-height:260px;overflow-y:auto;font-family:ui-monospace,Consolas,monospace;color:#451a03}
+  textarea.box{width:100%;min-height:130px;font-size:14px;font-family:ui-monospace,Consolas,monospace;border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff;color:var(--ink);resize:vertical}
+  textarea.box:focus{outline:none;border-color:var(--primary)}
+  .log-box{background:var(--ink);color:#d1d5db;font-family:ui-monospace,Consolas,monospace;font-size:12px;border-radius:10px;padding:12px;max-height:220px;overflow-y:auto;margin-top:10px;white-space:pre-wrap;word-break:break-all}
+  .log-box .err{color:#fca5a5}.log-box .ok{color:#86efac}.log-box .warn{color:#fcd34d}
+  .criteria-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:8px}
+  .criteria-grid .c{background:#f8f9fb;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--sub)}
+  .criteria-grid .c b{display:block;color:var(--ink);font-size:13px}
+  /* 拆解区 */
+  .ana-block{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
+  .ana-row{display:flex;gap:10px;font-size:13.5px;padding:5px 0}
+  .ana-row .k{flex:none;width:88px;color:var(--sub);font-size:13px}
+  .ana-row .v{flex:1}
+  .ana-row .v ul{margin:0;padding-left:18px}
+  .vp-author{color:#0369a1}
+  .vp-unverified{color:#b45309}
+  .score-bar{height:8px;background:#f1f2f6;border-radius:999px;overflow:hidden;margin-top:4px}
+  .score-bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--primary),#ff7a59)}
+  .no-transcript{background:#f8f9fb;border:1px dashed var(--line);border-radius:10px;padding:16px;text-align:center;color:var(--sub);font-size:13px;margin-top:10px}
+  /* 弹窗 */
+  .modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
+  .modal-mask.show{display:flex}
+  .modal{background:#fff;border-radius:16px;padding:22px;max-width:560px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.2);max-height:88vh;overflow-y:auto}
+  .modal h4{font-size:16px;margin-bottom:12px}
+  .modal p{font-size:14px;color:var(--sub);margin-bottom:16px}
+  .modal .row{display:flex;gap:10px;justify-content:flex-end;margin-top:14px}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .form-grid .full{grid-column:1/-1}
+  .form-grid label{display:block;font-size:12px;color:var(--sub);margin-bottom:4px}
+  .form-grid input,.form-grid select,.form-grid textarea{width:100%;min-height:40px;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:14px;background:#fff;color:var(--ink);font-family:inherit}
+  .form-grid textarea{min-height:90px;resize:vertical}
+  .form-grid input:focus,.form-grid select:focus,.form-grid textarea:focus{outline:none;border-color:var(--primary)}
+  /* toast */
+  .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;font-size:13px;border-radius:999px;padding:10px 20px;opacity:0;pointer-events:none;transition:.25s;z-index:60}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast.err{background:var(--red)}
+  @media (max-width:767px){
+    .wrap{padding:12px 12px calc(80px + env(safe-area-inset-bottom))}
+    .brand h1{font-size:17px}
+    .tabs{position:fixed;left:0;right:0;bottom:0;z-index:40;border-radius:0;border-left:none;border-right:none;border-bottom:none;margin:0;padding:6px 6px calc(6px + env(safe-area-inset-bottom));box-shadow:0 -2px 12px rgba(0,0,0,.08)}
+    .tab{min-width:0;font-size:12px;padding:8px 2px;min-height:48px}
+    .vcard .head{flex-direction:column}
+    .score-pill{align-self:flex-start;display:flex;gap:6px;align-items:baseline}
+    .score-pill b{font-size:16px}
+    .form-grid{grid-template-columns:1fr}
+    input,textarea,select{font-size:16px !important}
+  }
+</style>
+</head>
+<body data-page-node-id="kMPFoCMbnup9yVMx6Z9VWG">
+<div class="wrap" data-page-node-id="afwtl3dnDMJ25uLx274We6">
+
+  <div class="topbar" data-page-node-id="uFsoPQkQMvjy7X2UjZ59KL">
+    <div class="brand" data-page-node-id="MwhuU8PCGp2cH35m9E2jd5">
+      <svg viewBox="0 0 48 48" fill="none" data-page-node-id="YllD0yA3sAv6DNCfxGHHAZ"><rect width="48" height="48" rx="12" fill="#161823" data-page-node-id="ehASJftzAPVUZyRVIW2xMK"/><path d="M30 10v16.5a7.5 7.5 0 1 1-5.2-7.15" stroke="#fe2c55" stroke-width="3.4" stroke-linecap="round" data-page-node-id="eIqzZLQPzG2ZOTc6vd8uS8"/><path d="M30 10c.6 4.8 3.6 8.1 8 8.6" stroke="#25F4EE" stroke-width="3.4" stroke-linecap="round" data-page-node-id="V4f9IHx1WQtrpTHwslq8bG"/><path d="M14 34l4-4m0 0l3 3-4 4-3-3z" fill="#fe2c55" opacity=".9" data-page-node-id="O0E0PWsGnMtY8o82iFmH29"/></svg>
+      <div data-page-node-id="GJdQBiqw1ToAbTS6NZ6DT2">
+        <h1 data-page-node-id="biiN8shu6uC9prA34M8KVD">抖音AI爆款口播选题工作台</h1>
+        <div class="sub" data-page-node-id="7u3hZWdIvpTv96mXJjHhtC">AI教学类为主 · AI认知类补充 · 采集 / 筛选 / 拆解</div>
+      </div>
+    </div>
+    <div class="top-right" data-page-node-id="ArRiMYjijvkecKGVec2MQL">
+      <span class="demo-switch" id="demoSwitch" title="显示/隐藏模拟演示数据" data-page-node-id="zXqz7Dzx1XwzZa9oLODmxy"><span class="sw" data-page-node-id="McEjFPBGK4cE0dkfwDU1TJ"></span>演示模式</span>
+      <span class="sync-badge" id="syncBadge" data-page-node-id="fzSnvB8XQnqpS9Cz92v7dh"><span class="sync-dot" data-page-node-id="zFTH4lqKfSMm89deqezBwx"></span><span id="syncText" data-page-node-id="IFhQBchdmnFEEPb1XhAKtm">数据仅保存在当前浏览器</span></span>
+    </div>
+  </div>
+
+  <!-- 主操作 -->
+  <div class="hero" data-page-node-id="Gbn0U8JtHLSMnPWQhK263B">
+    <button class="btn btn-primary" data-goto="collect" data-page-node-id="okC8Vnj5Caas82EvWiZmZE"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="KXbR92RUFF9A9jioiSbVSV"><circle cx="11" cy="11" r="7" data-page-node-id="vTsBUHdXFumQgI1yVeYiMP"/><path d="M21 21l-4.3-4.3" data-page-node-id="bZEtDiKOMldxwDC3zeSiSD"/></svg>开始搜索</button>
+    <button class="btn btn-dark" data-goto="candidate" data-page-node-id="ITOwx46T2g4jOQXtZndAJy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="alrFhdoVLlgsJe0uzJoYCb"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" data-page-node-id="uJ5fKHwA3bJgYYdruP0QNe"/></svg>查看候选</button>
+  </div>
+
+  <!-- 次要操作 -->
+  <details class="more" data-page-node-id="rDuLpbsg34CWgZF3DdH6Lt">
+    <summary data-page-node-id="kyhBmCFTenrQx7pqYfWIkq">备份与数据管理</summary>
+    <div class="more-body" data-page-node-id="Qz8M6dOE2t16LXPMKqzn2W">
+      <button class="btn btn-sm" id="btnExportBackup" data-page-node-id="daqh7V1LWnLWXHqVK7oGQ0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="vYX6S1XlF0jjuQuf5tAVIs"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" data-page-node-id="QFyiPkFMACX4LVCvW0CS4N"/></svg>导出备份</button>
+      <button class="btn btn-sm" id="btnImportBackup" data-page-node-id="t8niajgICkMhEYLCEjDDA7"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="LdlVsgVW8GikVCjaktjRcB"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" data-page-node-id="xTCwd8LRv3tg4iHWo7wc2J"/></svg>导入备份</button>
+      <input type="file" id="importBackupFile" accept=".json" style="display:none" data-page-node-id="wwxnKFL3txWRgR1WpuZFIW">
+      <button class="btn btn-sm" id="btnExportCsv" data-page-node-id="YeOXZGbqPVLT00eHYv2QeC"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="FHcCwmVWp8CQRHAFQcPXwC"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" data-page-node-id="fs4lIpfuHw7THXAtkEBMMz"/><path d="M14 2v6h6M9 13h6M9 17h6" data-page-node-id="RO3NigLKNmGwMC1IpVjFCb"/></svg>导出表格</button>
+      <button class="btn btn-sm btn-danger" id="btnClearSample" data-page-node-id="gqdFXAZuKKJCVIBITB5gVb">清空演示数据</button>
+      <button class="btn btn-sm btn-danger" id="btnClearAll" data-page-node-id="LCB2QfgkJUc8WCIEgGtBBs">清空全部</button>
+    </div>
+  </details>
+
+  <!-- 今天要处理 -->
+  <div class="today-box" data-page-node-id="NkMpDRQEsX8IIcdr8FV3R7">
+    <h2 data-page-node-id="wv0gam9OG5DzqCLaLNYOtB"><span class="dot" data-page-node-id="fjXk3AaRGrwiqwfUBY7NpQ"></span>今天要处理</h2>
+    <div id="todayList" data-page-node-id="sRs6eWli5HDdZYKtHJio2B"></div>
+  </div>
+
+  <!-- Tab -->
+  <div class="tabs" id="tabs" data-page-node-id="3xcTLkOxKp3B2lbAZ1TPXq">
+    <button class="tab" data-tab="collect" data-page-node-id="zsMEs0wLGOBq4hisMZwDLh">开始采集</button>
+    <button class="tab active" data-tab="candidate" data-page-node-id="ynkWXjjDvULfzVScdC8xTE">今日候选<span class="cnt" id="cntCandidate" data-page-node-id="ZDPffExRpYF0p6JzmTG2GO">0</span></button>
+    <button class="tab" data-tab="review" data-page-node-id="dRhjmWOB5p9G10EAwd7dhk">待复核<span class="cnt" id="cntReview" data-page-node-id="bQoOAbufoVKD0cLMXXt8qT">0</span></button>
+    <button class="tab" data-tab="selected" data-page-node-id="yu3rTuHiNbGn8OBFGyfMs5">已入选<span class="cnt" id="cntSelected" data-page-node-id="6TeRMGzosAw4JrubFW7DIM">0</span></button>
+    <button class="tab" data-tab="rejected" data-page-node-id="6WIHjqTheleyTGu4RyOIWT">已淘汰<span class="cnt" id="cntRejected" data-page-node-id="7EKJ33hLiFK4IBeXRi774E">0</span></button>
+    <button class="tab" data-tab="analysis" data-page-node-id="uJVNiJbhxV61H59wa1bQoF">文案拆解</button>
+  </div>
+
+  <div id="panel" data-page-node-id="9d9RspDg9IjcIUlzfM3Ngs"></div>
+</div>
+
+<!-- 通用确认弹窗 -->
+<div class="modal-mask" id="modalMask" data-page-node-id="ja1EnXEduvetPqVdkCYzEk">
+  <div class="modal" data-page-node-id="oGff4S7GwTVj2VT9b8ISqs">
+    <h4 id="modalTitle" data-page-node-id="PhUCdnPgztelEMvFzLGfZq">确认操作</h4>
+    <p id="modalText" data-page-node-id="PGVc4gdpTyB3MMxq39hDvd"></p>
+    <div class="row" data-page-node-id="QywyKeN5gQ4GXANyXQNbuu">
+      <button class="btn" id="modalCancel" data-page-node-id="kUWHDKIMKsDctQ5PB3qE7c">取消</button>
+      <button class="btn btn-primary" id="modalOk" data-page-node-id="hfk9DKLrxrpss40yWIeOIf">确认</button>
+    </div>
+  </div>
+</div>
+
+<!-- 编辑资料弹窗 -->
+<div class="modal-mask" id="editMask" data-page-node-id="Nz3uhTdvOmiIIvPqfxWAaR">
+  <div class="modal" data-page-node-id="rxG5h20F3DwHdjXroSRKBu">
+    <h4 data-page-node-id="lg7BOhzYLEa4KN0EaH3e9l">编辑资料</h4>
+    <div class="form-grid" data-page-node-id="i1Jh9aE4HwqgKFnz4ztNaV">
+      <div class="full" data-page-node-id="4qyZFJK6DxFuCFCK3WlYBx"><label data-page-node-id="Kc4rMh2zlRoma5uaSk3PUv">视频标题</label><input id="f_title" data-page-node-id="OvPs3fAFXCDujwhpgMDAn4"></div>
+      <div class="full" data-page-node-id="JJEPX4MikYYJAA6OMIiBQt"><label data-page-node-id="a5DoWxw1TQNdIboDfsngcE">抖音链接</label><input id="f_link" data-page-node-id="RQ7E4hoCC7pqYh8hkINWdJ"></div>
+      <div data-page-node-id="63dmLDClD7gn0bBEFf7N7f"><label data-page-node-id="ige7qWHRAkG1VbSqHabt1k">作者名称</label><input id="f_author" data-page-node-id="V6BCmW01kglv7FZXViQ5x5"></div>
+      <div data-page-node-id="ws6l2TEYvEI4zyjlUSHLxI"><label data-page-node-id="iCkGKgNIVR6CB09mNMwG54">发布时间（YYYY-MM-DD 或 YYYY-MM-DD HH:mm）</label><input id="f_publishTime" placeholder="2026-09-10 12:00" data-page-node-id="SgeG3tiCFLJPGYfJ9MNUKZ"></div>
+      <div data-page-node-id="0xROCA20Of2XOOvqto2ZOV"><label data-page-node-id="NxznepEbO4AAIHpLKoGqN6">视频时长</label><input id="f_duration" placeholder="如 2分30秒" data-page-node-id="77bgBdnKJFkwQFEDmTXWUA"></div>
+      <div data-page-node-id="9s1H9Jfdl8duGTFAhuXnoo"><label data-page-node-id="7hOQ78Fon5Ltr2VGvEiSbS">粉丝数（纯数字，未知留空）</label><input id="f_fans" type="number" data-page-node-id="N6T479GzPbTCfYLuMGnZcJ"></div>
+      <div data-page-node-id="Hg3gWITIG36O8sn6LA1AgL"><label data-page-node-id="wLuNFmlw4eaM5HyWly8Ysx">点赞数</label><input id="f_likes" type="number" data-page-node-id="jNG8PLmTpP4DjT2AOwpD6X"></div>
+      <div data-page-node-id="1hTkYdVZVYpmkRwpTXKJ1v"><label data-page-node-id="zSlmu1RzNJ4curzJogbAAB">评论数</label><input id="f_comments" type="number" data-page-node-id="EQU9nuNUh65F5GrD8DJhdL"></div>
+      <div data-page-node-id="81QmU6bF8GKGiCAuTWfW0T"><label data-page-node-id="wEMOinPpbs17ShWE9PHoB3">收藏数</label><input id="f_favorites" type="number" data-page-node-id="lcdT3L2RpBfwtvWaLKq8lb"></div>
+      <div data-page-node-id="z5cOVNqszJEeGj0ZjlT4PB"><label data-page-node-id="ALISSZhFCZEh8QLDcDHQaK">分享数</label><input id="f_shares" type="number" data-page-node-id="nnsBKJVyVIt4yIhknzfuov"></div>
+      <div data-page-node-id="DsaZXbmTyWEX0JaLCLCn9h"><label data-page-node-id="C4RDbL7QBYVI1OzVy4sjNP">内容类型</label><select id="f_contentType" data-page-node-id="wt7yJKk2HIOUzebgbyUA9J">
+        <option value="" data-page-node-id="0Yzx4gxu4ERNEwUrKCF1Ph">未知</option><option data-page-node-id="3z2sp1X7HG2vp8mFCNhZ2Y">真人口播</option><option data-page-node-id="wZJ3LVlnZVXDiMVjhjxAq6">人物加屏幕</option><option data-page-node-id="Qt9pKJydxCy0We0oPABNVd">配音讲解</option><option data-page-node-id="ZEpd2hG7uY0bH7ygjTMdlK">剧情</option><option data-page-node-id="1HLliQ6GTWNIzXQ25501mO">其他</option>
+      </select></div>
+      <div data-page-node-id="Xu4QOV76CtzzxeSVAzI0L9"><label data-page-node-id="mKEvP4bKVWTfJthV7KKcEI">话题分类</label><select id="f_topic" data-page-node-id="bRJQeAruvsNU88yHEdRqoT">
+        <option value="" data-page-node-id="ipLNlLt47crcxgd0mCKGpU">未分类</option><option>AI教程</option><option>AI工具实操</option><option>AI工作流</option><option>提示词与智能体教学</option><option data-page-node-id="01kHMLO0EmePQcAFrawAyf">AI与普通人</option><option data-page-node-id="msxQ56Vf6UuxnfgzHqAl5z">AI未来发展</option><option data-page-node-id="WYuvf8h0c3obD2SpkmHQ5N">AI与职业就业</option><option data-page-node-id="tD8EUbKzbEAWzBDjsUJojA">AI概念科普</option><option data-page-node-id="UfNGUbfu17TXmHTcLSQfBA">普通人用AI</option><option data-page-node-id="CogYp7hikchF1FyyGV7yTG">AI机会与焦虑</option>
+      </select></div>
+      <div class="full" data-page-node-id="BHk8CC26W9EAY6p3cXs7GZ"><label data-page-node-id="E1WeFl89C3015STKmd1Y8g">口播文案 / 字幕转写（用于文案拆解，没有可留空）</label><textarea id="f_transcript"></textarea></div>
+    </div>
+    <div class="row" data-page-node-id="EfwGP5j2wEhyvl7apniect">
+      <button class="btn" id="editCancel" data-page-node-id="VsD8cN7llkleAEbJ3YHGKi">取消</button>
+      <button class="btn btn-primary" id="editSave" data-page-node-id="KQ2yx6mWHzAbbQVZLzsU2b">保存并重新筛选</button>
+    </div>
+  </div>
+</div>
+
+<!-- 更新数据弹窗 -->
+<div class="modal-mask" id="updateMask" data-page-node-id="yVN1SHDNkrN9dmbPJORFIb">
+  <div class="modal" data-page-node-id="dZhYFRuAbCdE3Mv0YvYRTN">
+    <h4 data-page-node-id="lavCDNbhbTOtt8ZbPx2HBL">更新数据</h4>
+    <p data-page-node-id="tRgswzvZDpDXsy272AfHGT">粘贴这条视频的最新采集 JSON（字段会合并，已有的备注、状态、拆解结果保留不变）。</p>
+    <textarea class="box" id="updateBox" placeholder='{"fans":23000,"likes":15000,"comments":210,"publishTime":"2026-09-09 18:30"}'></textarea>
+    <div class="row" data-page-node-id="KvopFHIpjsXKCjAzrKWzxp">
+      <button class="btn" id="updateCancel" data-page-node-id="qyMax0T3Gg7tFkjpCBGKHG">取消</button>
+      <button class="btn btn-primary" id="updateSave" data-page-node-id="z1XsrhbjcCG776v7HgwivB">合并更新并重新筛选</button>
+    </div>
+  </div>
+</div>
+
+<!-- 人工例外弹窗 -->
+<div class="modal-mask" id="overrideMask" data-page-node-id="Hz8D9CnAg0FsRgwJvRUJwM">
+  <div class="modal" data-page-node-id="6l9b5BZD1VwIx7uLeSKJ9D">
+    <h4 data-page-node-id="9vzoQRH1YjHFnGH3B5xU1Q">人工例外保留</h4>
+    <p data-page-node-id="CXnuFjdOv6307W9G354lGL">该记录未通过或未确认基础条件。人工保留后将标注「人工例外」，不会显示为「基础条件通过」。请填写保留理由：</p>
+    <textarea class="box" id="overrideReason" style="min-height:80px" placeholder="例如：互动数据虽未达标，但文案结构极完整，值得拆解学习"></textarea>
+    <div class="row" data-page-node-id="tjOgSivQbjKiw7UBARbwDQ">
+      <button class="btn" id="overrideCancel" data-page-node-id="VOEOpZqqlg4jOLk2rratQZ">取消</button>
+      <button class="btn btn-primary" id="overrideSave" data-page-node-id="qc9Kr2kyHBfcaLlel6JPt6">确认保留</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" data-page-node-id="xcWhMPoAJObZMFv5aV6lRI"></div>
+
+<script>
+/* =========================================================
+ * 数据层
+ * ========================================================= */
+var LS_KEY = 'wb_douyin_koubo_videos_v2';
+var LS_LOG = 'wb_douyin_koubo_logs_v2';
+var LS_DEMO = 'wb_douyin_koubo_demomode_v2';
+
+var HARD = { hours:336, urgentHours:288, fansMax:100000, likesMin:10000, commentsMin:100, ratioMin:0.20 };
+var TEACHING_TOPICS = ['AI教程','AI工具实操','AI工作流','提示词与智能体教学'];
+var COGNITION_TOPICS = ['AI与普通人','AI未来发展','AI与职业就业','AI概念科普','普通人用AI','AI机会与焦虑'];
+var RELATED_TOPICS = TEACHING_TOPICS.concat(COGNITION_TOPICS);
+var DEFAULT_KW = ['AI教程','AI工具实操','AI工作流','提示词 智能体教学'];
+
+var state = { videos: [], logs: [], tab: 'candidate', demoMode: false, query: '', sort: 'priority' };
+
+function saveData(){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify(state.videos));
+    localStorage.setItem(LS_LOG, JSON.stringify(state.logs.slice(-200)));
+    localStorage.setItem(LS_DEMO, state.demoMode ? '1' : '0');
+    setSync(true);
+    return true;
+  }catch(e){
+    setSync(false, e && e.message ? e.message : '存储空间不足');
+    return false;
+  }
+}
+function setSync(ok, msg){
+  var badge = document.getElementById('syncBadge');
+  var txt = document.getElementById('syncText');
+  if(ok){
+    badge.classList.remove('fail');
+    txt.textContent = '已保存到本浏览器 ' + nowStr().slice(11);
+  }else{
+    badge.classList.add('fail');
+    txt.textContent = '保存失败：' + (msg || '未知原因');
+    toast('保存失败：' + (msg || '未知原因') + '，请立即导出备份', true);
+  }
+}
+function nowStr(){
+  var d = new Date();
+  function p(n){ return n<10?'0'+n:''+n; }
+  return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes());
+}
+function addLog(msg, level){
+  state.logs.push({ t: nowStr(), msg: msg, level: level||'info' });
+  saveData();
+}
+function toast(msg, isErr){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.toggle('err', !!isErr);
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function(){ t.classList.remove('show'); }, 2600);
+}
+
+/* =========================================================
+ * 计算层：时间（北京时间）/ 数字 / 筛选
+ * ========================================================= */
+/* 把 'YYYY-MM-DD[ HH:mm]' 按北京时间解析为绝对时间；非法返回 null */
+function parsePubTime(s){
+  if(!s) return null;
+  var m = String(s).trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2}):(\d{1,2}))?/);
+  if(!m) return null;
+  var y=+m[1], mo=+m[2], d=+m[3], h=m[4]?+m[4]:0, mi=m[5]?+m[5]:0;
+  if(mo<1||mo>12||d<1||d>31||h>23||mi>59) return null;
+  var t = Date.UTC(y, mo-1, d, h-8, mi); /* 北京时间 → UTC */
+  var chk = new Date(t);
+  if(chk.getUTCMonth() !== mo-1) return null;
+  return t;
+}
+/* 小时差：>=0 已发布，<0 未来时间，null 无效 */
+function ageHours(v){
+  var t = parsePubTime(v.publishTime);
+  if(t === null) return null;
+  return (Date.now() - t) / 3600000;
+}
+function isExpired(v){
+  var h = ageHours(v);
+  return h !== null && h > HARD.hours;
+}
+function parseWan(v){
+  if(v === null || v === undefined || v === '' || v === '未知') return { val:null, approx:false };
+  if(typeof v === 'number') return { val:v, approx:false };
+  var s = String(v).trim().replace(/,/g,'');
+  var m = s.match(/^([\d.]+)\s*万$/);
+  if(m) return { val: Math.round(parseFloat(m[1]) * 10000), approx:true };
+  var n = parseFloat(s);
+  return isNaN(n) ? { val:null, approx:false } : { val:Math.round(n), approx:false };
+}
+function approxUnit(val){ return val % 10000 === 0 ? 10000 : 1000; }
+/* 约数跨越阈值 → 无法确定是否满足优先信号 */
+function isAmbiguous(num, approx, threshold){
+  if(num === null || !approx) return false;
+  var u = approxUnit(num);
+  return (num - u) < threshold && threshold < (num + u);
+}
+function ratioOf(v){
+  if(v.fans === null || v.fans <= 0 || v.likes === null) return null;
+  return v.likes / v.fans;
+}
+/* 基础条件核查：verdict = pass | review | fail */
+function checkHard(v){
+  var fails = [], reviews = [];
+  var h = ageHours(v);
+  if(h === null) reviews.push(v.publishTime ? '发布时间无效（'+v.publishTime+'）' : '发布时间缺失');
+  else if(h < -0.5) reviews.push('发布时间在未来，属无效时间');
+  else if(h > HARD.hours) fails.push('发布已超过336小时（约'+Math.floor(h/24)+'天前）');
+  if(v.fans === null) reviews.push('粉丝数缺失');
+  if(v.likes === null) reviews.push('点赞数缺失');
+  if(v.comments === null) reviews.push('评论数缺失');
+  var r = ratioOf(v);
+  if(r === null && v.fans !== null && v.likes !== null) reviews.push('赞粉比无法计算');
+  if(!v.topic) reviews.push('话题未分类');
+  else if(RELATED_TOPICS.indexOf(v.topic) < 0) fails.push('话题不属于AI教学类或AI认知类');
+  if(!v.contentType) reviews.push('内容类型未确认');
+  else if(v.contentType === '剧情') fails.push('剧情/短剧类内容按规则排除');
+  var verdict = fails.length ? 'fail' : (reviews.length ? 'review' : 'pass');
+  return { verdict:verdict, fails:fails, reviews:reviews };
+}
+/* 综合优先级分 */
+function priorityScore(v){
+  var s = 0;
+  if(v.contentType === '真人口播') s += 40; else if(v.contentType === '人物加屏幕') s += 15;
+  var r = ratioOf(v);
+  if(v.fans !== null && v.likes !== null){
+    if(v.fans <= HARD.fansMax && v.likes >= HARD.likesMin) s += 30;
+    if(r !== null) s += Math.min(20, r * 20);
+  }
+  if(v.comments !== null) s += Math.min(20, v.comments / 100);
+  if(v.analysis){
+    if(v.analysis.score) s += v.analysis.score * 0.25;
+    if(v.analysis.adaptable === '适合') s += 10; else if(v.analysis.adaptable === '勉强') s += 4;
+  }
+  var h = ageHours(v);
+  if(h !== null && h >= 0) s += Math.max(0, 10 - (h/24) * 1.5);
+  return Math.round(s * 10) / 10;
+}
+function referenceRank(v){
+  var score = v.referenceScore;
+  if(score === null || score === undefined || score === '') score = v.analysis && v.analysis.score;
+  score = Number(score);
+  return isNaN(score) ? 0 : score;
+}
+function topicRank(v){
+  if(TEACHING_TOPICS.indexOf(v.topic) >= 0) return 2;
+  if(COGNITION_TOPICS.indexOf(v.topic) >= 0) return 1;
+  return 0;
+}
+function contentRank(v){
+  if(v.contentType === '真人口播') return 2;
+  if(v.contentType === '人物加屏幕') return 1;
+  return 0;
+}
+function lowFansHighLikesRank(v){
+  var r = ratioOf(v);
+  if(v.fans === null || v.likes === null) return -1;
+  var s = 0;
+  if(v.fans <= HARD.fansMax) s += 2;
+  if(v.likes >= HARD.likesMin) s += 2;
+  if(r !== null && r >= HARD.ratioMin) s += 1;
+  return s;
+}
+function fmtNum(n){
+  if(n === null || n === undefined) return '未知';
+  if(n >= 10000) return (n/10000).toFixed(n % 10000 === 0 ? 0 : 1) + '万';
+  return String(n);
+}
+function fmtRatio(v){
+  var r = ratioOf(v);
+  return r === null ? '未知' : (r*100).toFixed(1) + '%';
+}
+function esc(s){
+  return String(s === null || s === undefined ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function canonLink(link){
+  if(!link) return '';
+  var m = String(link).match(/(video|shipin)\/(\d+)/);
+  return m ? m[1] + '/' + m[2] : String(link).trim();
+}
+
+/* =========================================================
+ * 预置数据：真实采集记录 + 演示（模拟）记录
+ * ========================================================= */
+function seedReal(){
+  return [
+    { id:'real_tk_koubo_7682771718289650938', title:'90%的人用 AI 做口播，死在这一步', link:'https://www.douyin.com/video/7682771718289650938', author:'TK科技测评', publishTime:'2026-09-07 20:38', duration:'2分45秒', fans:2867000, likes:20053, comments:386, favorites:343, shares:30, approx:{fans:true, likes:false, comments:false, favorites:false, shares:false}, contentType:'配音讲解', topic:'AI工作流', status:'candidate', manualOverride:false, overrideReason:'', reason:'内容适合参考/改编成口播为主：痛点开场并完整讲工作台抓选题、拆结构、生成新钩子与分镜的流程；互动数据为加分。', note:'', transcript:'', analysis:{score:96, adaptable:'适合', scoreReason:'痛点开场，完整讲工作台抓选题、拆结构、生成新钩子与分镜的流程，适合改成口播。'}, isSample:false, collectedBy:'real', createdAt:nowStr(), updatedAt:nowStr() },
+    { id:'real_weiji_7682463704775970075', title:'GPT6给我剪出一条万赞爆款', link:'https://www.douyin.com/video/7682463704775970075', author:'未济', publishTime:'2026-09-07 12:05', duration:'2分11秒', fans:11000, likes:12321, comments:199, favorites:10098, shares:2736, approx:{fans:true, likes:false, comments:false, favorites:false, shares:false}, contentType:'真人口播', topic:'AI工作流', status:'candidate', manualOverride:false, overrideReason:'', reason:'内容适合参考/改编成口播为主：AI自动剪辑工作流案例明确、流程感强；真人口播、低粉高赞与评论活跃为加分。', note:'', transcript:'', analysis:{score:94, adaptable:'适合', scoreReason:'AI自动剪辑工作流，案例明确、流程感强，适合真人口播。'}, isSample:false, collectedBy:'real', createdAt:nowStr(), updatedAt:nowStr() },
+    { id:'real_xiaowei_7682815272499978993', title:'蒸馏就是AI时代的合法抢劫', link:'https://www.douyin.com/video/7682815272499978993', author:'小魏开窍了', publishTime:'2026-09-07 23:27', duration:'1分40秒', fans:45000, likes:8330, comments:351, favorites:8193, shares:2039, approx:{fans:true, likes:false, comments:false, favorites:false, shares:false}, contentType:'真人口播', topic:'AI概念科普', status:'candidate', manualOverride:false, overrideReason:'', reason:'内容适合参考/改编成口播为主：概念类强钩子，适合改编为AI认知口播，但表述需核实；真人口播、低粉高赞与评论活跃为加分。', note:'', transcript:'', analysis:{score:92, adaptable:'适合', scoreReason:'概念类强钩子，适合改编为AI认知口播，但表述需核实。'}, isSample:false, collectedBy:'real', createdAt:nowStr(), updatedAt:nowStr() },
+    { id:'real_kaka_7683121496402925275', title:'AI当设计师时，就这样做完我的工作', link:'https://www.douyin.com/video/7683121496402925275', author:'卡卡大王（AI版）', publishTime:'2026-09-08 19:15', duration:'4分45秒', fans:1595000, likes:23272, comments:237, favorites:1219, shares:1039, approx:{fans:true, likes:false, comments:false, favorites:false, shares:false}, contentType:'真人口播', topic:'AI工具实操', status:'candidate', manualOverride:false, overrideReason:'', reason:'内容适合参考/改编成口播为主：真人讲解加实操，展示AI设计工作台完成工作的过程，适合教学口播；真人口播与互动数据为加分。', note:'', transcript:'', analysis:{score:90, adaptable:'适合', scoreReason:'真人讲解加实操，展示AI设计工作台完成工作的过程，适合教学口播。'}, isSample:false, collectedBy:'real', createdAt:nowStr(), updatedAt:nowStr() }
+  ];
+}
+function seedDemo(){
+  function d(days){ var t = new Date(Date.now() - days*86400000); return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0'); }
+  return [
+    { id:'demo1', title:'【模拟数据】别再被AI焦虑割韭菜了，普通人真正该学的是这3件事', link:'demo://sample1', author:'模拟博主A',
+      publishTime:d(1), duration:'3分12秒', fans:46000, likes:28000, comments:640, favorites:3100, shares:980, approx:null,
+      contentType:'真人口播', topic:'AI机会与焦虑', status:'candidate', manualOverride:false, overrideReason:'',
+      reason:'基础条件通过：优先级评分高（真人口播、低粉高赞、评论活跃）',
+      note:'', transcript:'（模拟文案）你是不是也被AI焦虑刷屏了……',
+      analysis:{ source:'模拟数据', summary:'拆解AI焦虑营销套路，给出3个学习方向', hook:'痛点反问开场', structure:'痛点→揭露→方案→号召', viewpoint:'AI焦虑是生意，掌握工具思维即可', emotion:'焦虑转释然', adaptable:'适合', score:88, scoreReason:'模拟评分', viewpointAuthor:['模拟观点'], viewpointUnverified:[], extensions:['模拟延伸选题1','模拟延伸选题2'] },
+      isSample:true, collectedBy:'demo', createdAt:nowStr(), updatedAt:nowStr() },
+    { id:'demo2', title:'【模拟数据】Token到底是什么？一条视频讲透大模型的计量单位', link:'demo://sample2', author:'模拟博主B',
+      publishTime:d(2), duration:'2分05秒', fans:12000, likes:15000, comments:210, favorites:5200, shares:1500, approx:null,
+      contentType:'人物加屏幕', topic:'AI概念科普', status:'candidate', manualOverride:false, overrideReason:'',
+      reason:'基础条件通过：优先级评分高（AI认知类补充、低粉高赞、评论活跃）',
+      note:'', transcript:'', analysis:null,
+      isSample:true, collectedBy:'demo', createdAt:nowStr(), updatedAt:nowStr() },
+    { id:'demo3', title:'【模拟数据】未来5年最可能被AI取代的10个职业', link:'demo://sample3', author:'模拟博主C',
+      publishTime:d(6), duration:'4分30秒', fans:89000, likes:31000, comments:1200, favorites:6800, shares:2400, approx:null,
+      contentType:'真人口播', topic:'AI与职业就业', status:'candidate', manualOverride:false, overrideReason:'',
+      reason:'基础条件通过，但已发布6天；距336小时时效临期阈值仍有空间',
+      note:'', transcript:'', analysis:null,
+      isSample:true, collectedBy:'demo', createdAt:nowStr(), updatedAt:nowStr() },
+    { id:'demo4', title:'【模拟数据】我用AI智能体自动回客户消息，一天省4小时', link:'demo://sample4', author:'模拟博主D',
+      publishTime:d(0), duration:'2分40秒', fans:23000, likes:null, comments:null, favorites:null, shares:null, approx:null,
+      contentType:'配音讲解', topic:'普通人用AI', status:'review', manualOverride:false, overrideReason:'',
+      reason:'待复核：互动数据未获取，不能按0处理',
+      note:'等补采互动数据', transcript:'', analysis:null,
+      isSample:true, collectedBy:'demo', createdAt:nowStr(), updatedAt:nowStr() },
+    { id:'demo5', title:'【模拟数据】AI写的短剧震惊全网，编剧要失业了？', link:'demo://sample5', author:'模拟博主E',
+      publishTime:d(3), duration:'1分48秒', fans:350000, likes:52000, comments:3000, favorites:4100, shares:5200, approx:null,
+      contentType:'剧情', topic:'AI未来发展', status:'rejected', manualOverride:false, overrideReason:'',
+      reason:'淘汰：剧情/短剧类按规则排除',
+      note:'', transcript:'', analysis:null,
+      isSample:true, collectedBy:'demo', createdAt:nowStr(), updatedAt:nowStr() }
+  ];
+}
+
+function loadData(){
+  try{
+    var raw = localStorage.getItem(LS_KEY);
+    state.videos = raw ? JSON.parse(raw) : null;
+    var lraw = localStorage.getItem(LS_LOG);
+    state.logs = lraw ? JSON.parse(lraw) : [];
+    state.demoMode = localStorage.getItem(LS_DEMO) === '1';
+  }catch(e){ state.videos = null; state.logs = []; }
+  if(state.videos === null){
+    state.videos = seedReal().concat(seedDemo());
+    addLog('首次打开：已载入 4 条真实采集记录 + 5 条演示（模拟）记录，演示模式默认关闭','info');
+  }
+  var existingIds = {};
+  state.videos.forEach(function(v){ existingIds[v.id] = true; });
+  var missingSeeds = seedReal().filter(function(v){ return !existingIds[v.id]; });
+  if(missingSeeds.length){
+    state.videos = state.videos.concat(missingSeeds);
+    saveData();
+  }
+}
+/* 每次打开/刷新：时效重检。候选/待复核中已过期的自动移出有效候选 */
+function recheckFreshness(){
+  var moved = 0;
+  state.videos.forEach(function(v){
+    if(v.isSample) return;
+    if((v.status === 'candidate' || v.status === 'review') && isExpired(v) && !v.manualOverride){
+      var chk = checkHard(v);
+      if(chk.verdict === 'fail'){
+        v.status = 'rejected';
+        v.reason = '已过期：' + chk.fails.join('；') + '（打开时自动重检）';
+        v.updatedAt = nowStr();
+        moved++;
+      }
+    }
+  });
+  if(moved) addLog('时效重检：' + moved + ' 条记录因超过336小时自动移出有效候选','warn');
+}
+
+/* =========================================================
+ * 渲染层
+ * ========================================================= */
+var $panel = document.getElementById('panel');
+
+function visibleVideos(){
+  if(state.demoMode) return state.videos;
+  return state.videos.filter(function(v){ return !v.isSample; });
+}
+function statusVideos(s){
+  return visibleVideos().filter(function(v){ return v.status === s; });
+}
+function applyQuerySort(list){
+  var q = state.query.trim().toLowerCase();
+  if(q) list = list.filter(function(v){
+    return (v.title||'').toLowerCase().indexOf(q) >= 0 || (v.author||'').toLowerCase().indexOf(q) >= 0;
+  });
+  var sort = state.sort;
+  list = list.slice().sort(function(a,b){
+    if(sort === 'likes') return (b.likes||-1) - (a.likes||-1);
+    if(sort === 'ratio'){ var ra=ratioOf(a), rb=ratioOf(b); return (rb===null?-1:rb) - (ra===null?-1:ra); }
+    if(sort === 'time'){ var ta=parsePubTime(a.publishTime)||0, tb=parsePubTime(b.publishTime)||0; return tb - ta; }
+    var byReference = referenceRank(b) - referenceRank(a); if(byReference) return byReference;
+    var byContent = contentRank(b) - contentRank(a); if(byContent) return byContent;
+    var byLowFansHighLikes = lowFansHighLikesRank(b) - lowFansHighLikesRank(a); if(byLowFansHighLikes) return byLowFansHighLikes;
+    var byComments = (b.comments===null?-1:b.comments) - (a.comments===null?-1:a.comments); if(byComments) return byComments;
+    return priorityScore(b) - priorityScore(a);
+  });
+  return list;
+}
+
+function renderToday(){
+  var box = document.getElementById('todayList');
+  var items = [];
+  visibleVideos().forEach(function(v){
+    var h = ageHours(v);
+    if(v.status === 'review'){
+      items.push({ v:v, tag:'<span class="tag tag-review">待复核</span>', tab:'review' });
+    }else if(v.status === 'candidate'){
+      if(h !== null && h > HARD.urgentHours) items.push({ v:v, tag:'<span class="tag tag-overdue">临期 · 发布'+Math.floor(h/24)+'天</span>', tab:'candidate' });
+      else items.push({ v:v, tag:'<span class="tag tag-new">今日候选</span>', tab:'candidate' });
+    }else if(v.status === 'selected' && isExpired(v)){
+      items.push({ v:v, tag:'<span class="tag tag-overdue">入选已过期</span>', tab:'selected' });
+    }
+  });
+  if(!items.length){
+    box.innerHTML = '<div class="today-empty">今天没有待处理的条目。点「开始搜索」发起一次采集任务吧。</div>';
+    return;
+  }
+  box.innerHTML = items.slice(0,8).map(function(it){
+    return '<div class="today-item">' + it.tag +
+      '<span class="t" title="'+esc(it.v.title)+'">'+esc(it.v.title)+'</span>' +
+      '<button class="btn btn-sm btn-primary" data-action="goto" data-tab="'+it.tab+'">去处理</button></div>';
+  }).join('');
+}
+
+function chipHtml(v, chk){
+  var chips = '';
+  if(v.isSample) chips += '<span class="chip sample-chip">模拟数据</span>';
+  if(v.collectedBy === 'real') chips += '<span class="chip real">真实采集</span>';
+  if(v.contentType) chips += '<span class="chip type">'+esc(v.contentType)+'</span>';
+  chips += '<span class="chip topic">'+esc(v.topic||'未分类')+'</span>';
+  if(TEACHING_TOPICS.indexOf(v.topic) >= 0) chips += '<span class="chip pass">AI教学类 · 主采集</span>';
+  else if(COGNITION_TOPICS.indexOf(v.topic) >= 0) chips += '<span class="chip type">AI认知类 · 补充</span>';
+  if(v.manualOverride) chips += '<span class="chip override">人工例外</span>';
+  if(isExpired(v) && v.status !== 'rejected') chips += '<span class="chip exp">已过期 · 超336小时</span>';
+  if(v.manualOverride){
+    chips += '<span class="chip warn">未通过基础条件（人工保留）</span>';
+  }else if(chk.verdict === 'pass') chips += '<span class="chip pass">✓ 基础条件通过</span>';
+  else if(chk.verdict === 'review') chips += '<span class="chip warn">待确认（'+chk.reviews.length+'项）</span>';
+  else chips += '<span class="chip fail">✗ 未通过基础条件（'+chk.fails.length+'项）</span>';
+  return chips;
+}
+
+function metricHtml(label, val){
+  if(val === null || val === undefined) return '<span>'+label+' <b class="missing">未获取</b></span>';
+  return '<span>'+label+' <b>'+fmtNum(val)+'</b></span>';
+}
+
+function cardHtml(v, actions){
+  var chk = checkHard(v);
+  var ana = v.analysis;
+  var score = ana && ana.score ? ana.score : null;
+  var linkHtml = v.link && v.link.indexOf('demo://') !== 0
+    ? '<a href="'+esc(v.link)+'" target="_blank" rel="noopener">'+esc(v.title)+'</a>'
+    : '<span class="nolink">'+esc(v.title)+'（模拟链接）</span>';
+  var detail = [];
+  if(chk.fails.length) detail.push('<b>未通过基础条件：</b>'+esc(chk.fails.join('；')));
+  if(chk.reviews.length) detail.push('<b>待确认：</b>'+esc(chk.reviews.join('；')));
+  if(v.manualOverride) detail.push('<b>人工例外理由：</b>'+esc(v.overrideReason||'—'));
+  return '<div class="vcard'+(isExpired(v)&&v.status!=='rejected'?' expired':'')+(v.isSample?' sample':'')+'" data-id="'+esc(v.id)+'">'
+    + '<div class="head"><div class="title">'+linkHtml+'</div>'
+    + (score !== null ? '<div class="score-pill"><b>'+score+'</b><span>可借鉴</span></div>' : '')
+    + '</div>'
+    + '<div class="meta">'
+    + '<span>作者 <b>'+esc(v.author||'未知')+'</b></span>'
+    + '<span>发布 '+(v.publishTime?'<b>'+esc(v.publishTime)+'</b>':'<b class="missing">未获取</b>')+'</span>'
+    + '<span>时长 '+(v.duration?'<b>'+esc(v.duration)+'</b>':'<b class="missing">未获取</b>')+'</span>'
+    + metricHtml('粉丝', v.fans) + metricHtml('点赞', v.likes) + metricHtml('评论', v.comments)
+    + metricHtml('收藏', v.favorites) + metricHtml('分享', v.shares)
+    + '<span>赞粉比 <b>'+fmtRatio(v)+'</b></span>'
+    + '</div>'
+    + '<div class="chips">'+chipHtml(v, chk)+'</div>'
+    + (detail.length ? '<div class="reason">'+detail.join('<br>')+'</div>' : '')
+    + '<div class="reason"><b>'+(v.status==='rejected'?'淘汰原因':v.status==='selected'?'入选说明':'筛选说明')+'：</b>'+esc(v.reason||'—')+'</div>'
+    + '<div class="card-actions">'+actions+'</div>'
+    + '<textarea class="note-input" data-action="note" placeholder="备注（自动保存）">'+esc(v.note||'')+'</textarea>'
+    + '<div class="updated">最后更新：'+esc(v.updatedAt||'—')+'</div>'
+    + '</div>';
+}
+
+function filterbarHtml(){
+  return '<div class="filterbar">'
+    + '<input id="searchBox" placeholder="搜索标题 / 作者" value="'+esc(state.query)+'">'
+    + '<select id="sortSel">'
+    + '<option value="priority"'+(state.sort==='priority'?' selected':'')+'>按综合优先级</option>'
+    + '<option value="likes"'+(state.sort==='likes'?' selected':'')+'>按点赞数</option>'
+    + '<option value="ratio"'+(state.sort==='ratio'?' selected':'')+'>按赞粉比</option>'
+    + '<option value="time"'+(state.sort==='time'?' selected':'')+'>按发布时间</option>'
+    + '</select></div>';
+}
+
+function commonActions(v, primary){
+  var h = '';
+  if(v.link && v.link.indexOf('demo://') !== 0){
+    h += '<a class="btn btn-sm btn-primary" href="'+esc(v.link)+'" target="_blank" rel="noopener">打开原视频</a>';
+    h += '<button class="btn btn-sm" data-action="copyLink" data-link="'+esc(v.link)+'">复制链接</button>';
+  }
+  h += '<button class="btn btn-sm" data-action="viewAnalysis">查看拆解</button>';
+  h += '<button class="btn btn-sm" data-action="edit">编辑资料</button>';
+  h += '<button class="btn btn-sm" data-action="updateData">更新数据</button>';
+  if(primary) h += primary;
+  return h;
+}
+
+function renderCandidate(){
+  var all = statusVideos('candidate');
+  var valid = all.filter(function(v){ return !isExpired(v); });
+  var expired = all.filter(function(v){ return isExpired(v); });
+  var list = applyQuerySort(valid);
+  var h = '<div class="panel"><h3><svg viewBox="0 0 24 24" fill="none" stroke="#fe2c55" stroke-width="2"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>今日候选 · 有效候选 '+valid.length+' 条</h3>'
+    + '<p class="tip">每次打开自动重检336小时时效；超过288小时（12天）标记临期，过期记录不进有效候选。综合排序：内容是否适合参考/改编成口播 &gt; 真人口播 &gt; 低粉高赞 &gt; 评论活跃；AI教学/AI认知仅作分类。</p>'
+    + '<p class="tip">提示：抖音网页版对部分视频限制「仅在 App 内观看」，浏览器打开若提示出错或看不到视频，请点「复制链接」粘贴到抖音 App 打开，或直接在抖音搜索作者名。</p></div>';
+  h += filterbarHtml();
+  if(!list.length) h += emptyHtml('暂无有效候选。点「开始搜索」发起采集任务，或调整搜索条件。');
+  else h += list.map(function(v){
+    return cardHtml(v, commonActions(v,
+      '<button class="btn btn-sm btn-dark" data-action="select">入选</button>'
+      +'<button class="btn btn-sm" data-action="toReview">转复核</button>'
+      +'<button class="btn btn-sm btn-danger" data-action="reject">淘汰</button>'));
+  }).join('');
+  if(expired.length){
+    h += '<div class="panel"><h3>已过期（'+expired.length+'条，不计入有效候选）</h3></div>';
+    h += expired.map(function(v){
+      return cardHtml(v, commonActions(v, '<button class="btn btn-sm btn-danger" data-action="reject">移入淘汰</button>'));
+    }).join('');
+  }
+  return h;
+}
+
+function renderReview(){
+  var list = applyQuerySort(statusVideos('review'));
+  var h = filterbarHtml();
+  if(!list.length) return h + emptyHtml('暂无待复核视频');
+  return h + list.map(function(v){
+    return cardHtml(v, commonActions(v,
+      '<button class="btn btn-sm btn-dark" data-action="select">复核通过·入选</button>'
+      +'<button class="btn btn-sm" data-action="keepOverride">人工例外保留</button>'
+      +'<button class="btn btn-sm btn-danger" data-action="reject">淘汰</button>'));
+  }).join('');
+}
+
+function renderSelected(){
+  var list = applyQuerySort(statusVideos('selected'));
+  var h = filterbarHtml();
+  if(!list.length) return h + emptyHtml('还没有入选视频');
+  return h + list.map(function(v){
+    return cardHtml(v, commonActions(v, '<button class="btn btn-sm" data-action="toCandidate">退回候选</button>'));
+  }).join('');
+}
+
+function renderRejected(){
+  var list = applyQuerySort(statusVideos('rejected'));
+  var h = filterbarHtml();
+  if(!list.length) return h + emptyHtml('暂无淘汰记录');
+  return h + list.map(function(v){
+    return cardHtml(v, commonActions(v,
+      '<button class="btn btn-sm" data-action="toCandidate">恢复为候选</button>'
+      +'<button class="btn btn-sm" data-action="keepOverride">人工例外保留</button>'));
+  }).join('');
+}
+
+function renderAnalysis(){
+  var list = visibleVideos().slice().sort(function(a,b){
+    return ((b.analysis&&b.analysis.score)||0) - ((a.analysis&&a.analysis.score)||0);
+  });
+  if(!list.length) return emptyHtml('暂无记录');
+  return list.map(function(v){
+    var a = v.analysis;
+    var head = '<div class="vcard'+(v.isSample?' sample':'')+'" data-id="'+esc(v.id)+'">'
+      + '<div class="head"><div class="title">'
+      + (v.link && v.link.indexOf('demo://')!==0 ? '<a href="'+esc(v.link)+'" target="_blank" rel="noopener">'+esc(v.title)+'</a>' : '<span class="nolink">'+esc(v.title)+'（模拟链接）</span>')
+      + '</div>'
+      + (a && a.score ? '<div class="score-pill"><b>'+a.score+'</b><span>可借鉴</span></div>' : '') + '</div>';
+    if(v.isSample) head += '<div class="chips"><span class="chip sample-chip">模拟数据</span></div>';
+    if(!v.transcript && !a){
+      return head + '<div class="no-transcript">待获取文案——没有拿到字幕/转写前不会生成拆解，不会根据标题虚构内容。</div>'
+        + '<div class="card-actions"><button class="btn btn-sm btn-primary" data-action="edit">粘贴文案并分析</button></div>'
+        + '<div class="updated">作者：'+esc(v.author||'未知')+' · 最后更新：'+esc(v.updatedAt||'—')+'</div></div>';
+    }
+    if(!a){
+      return head + '<div class="no-transcript">已有文案，尚未生成拆解。点「分析文案」生成拆解任务交给 WorkBuddy 执行。</div>'
+        + '<div class="card-actions"><button class="btn btn-sm btn-primary" data-action="edit">分析文案</button></div>'
+        + '<div class="updated">作者：'+esc(v.author||'未知')+'</div></div>';
+    }
+    return head
+      + '<div class="score-bar"><i style="width:'+(a.score||0)+'%"></i></div>'
+      + '<div class="ana-block">'
+      + anaRow('文案来源', a.source||'—')
+      + anaRow('一句话概括', a.summary)
+      + anaRow('开头钩子', a.hook)
+      + anaRow('文案结构', a.structure)
+      + anaRow('核心观点', a.viewpoint)
+      + anaRow('情绪类型', a.emotion)
+      + anaRow('口播适配度', a.adaptable)
+      + anaRow('评分理由', a.scoreReason)
+      + anaListRow('作者观点', a.viewpointAuthor, 'vp-author')
+      + anaListRow('尚待核实', a.viewpointUnverified, 'vp-unverified')
+      + anaListRow('延伸选题', a.extensions, '')
+      + '</div>'
+      + '<div class="card-actions"><button class="btn btn-sm" data-action="edit">更新文案/重新拆解</button></div>'
+      + '<div class="updated">作者：'+esc(v.author||'未知')+' · 最后更新：'+esc(v.updatedAt||'—')+'</div>'
+      + '</div>';
+  }).join('');
+}
+function anaRow(k, v){ return '<div class="ana-row"><span class="k">'+k+'</span><span class="v">'+esc(v||'—')+'</span></div>'; }
+function anaListRow(k, arr, cls){
+  if(!arr || !arr.length) return '';
+  return '<div class="ana-row"><span class="k">'+k+'</span><span class="v '+cls+'"><ul>'
+    + arr.map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('') + '</ul></span></div>';
+}
+
+function renderCollect(){
+  return '<div class="panel"><h3><svg viewBox="0 0 24 24" fill="none" stroke="#fe2c55" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>第一步：设置搜索方向</h3>'
+    + '<p class="tip">优先采集内容适合参考/改编成口播的视频；AI教学与AI认知仅作分类，可直接修改关键词。</p>'
+    + '<div class="kw-row"><input id="kw1" value="'+esc(DEFAULT_KW[0])+'"><input id="kw2" value="'+esc(DEFAULT_KW[1])+'"></div>'
+    + '<div class="kw-row"><input id="kw3" value="'+esc(DEFAULT_KW[2])+'"><input id="kw4" value="'+esc(DEFAULT_KW[3])+'"></div>'
+    + '<button class="btn btn-primary" data-action="genTask">开始搜索</button>'
+    + '<div class="criteria-grid">'
+    + '<div class="c"><b>≤ 336 小时</b>最近14天发布（硬条件）</div>'
+    + '<div class="c"><b>内容适配第一</b>是否适合参考/改编成口播</div>'
+    + '<div class="c"><b>排除剧情/短剧</b>内容类型（硬条件）</div>'
+    + '<div class="c"><b>真人口播加分</b>排序加分项</div>'
+    + '<div class="c"><b>低粉高赞优先</b>粉丝≤10万、点赞≥1万、赞粉比≥20%</div>'
+    + '<div class="c"><b>评论活跃优先</b>评论≥100；统计缺失转待复核</div>'
+    + '</div>'
+    + '<div class="task-card'+(state._taskText?' show':'')+'" id="taskCard">'
+    + '<h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#92400e" stroke-width="2"><path d="M12 9v4m0 4h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg>需要 WorkBuddy 执行</h4>'
+    + '<p class="tip">本网页无法直接调用浏览器采集能力。请把下面任务发给 WorkBuddy（点「复制任务」），拿到返回的 JSON 后粘贴到第二步导入。不会用假进度或模拟结果冒充采集成功。</p>'
+    + '<pre id="taskText">'+esc(state._taskText||'')+'</pre>'
+    + '<div class="card-actions"><button class="btn btn-sm btn-dark" data-action="copyTask">复制任务</button></div>'
+    + '</div></div>'
+    + '<div class="panel"><h3><svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>第二步：导入采集结果</h3>'
+    + '<p class="tip">粘贴 WorkBuddy 返回的采集 JSON。未获取到的数字字段填 null，系统标「未获取」并转待复核，绝不按 0 处理。同一链接重复导入会更新数据并保留你的备注和状态。</p>'
+    + '<textarea class="box" id="importBox" placeholder=\'[{"title":"…","link":"https://www.douyin.com/video/…","author":"…","publishTime":"2026-09-09 18:30","duration":"2分10秒","fans":23000,"likes":15000,"comments":210,"favorites":900,"shares":300,"contentType":"真人口播","topic":"AI与普通人"}]\'></textarea>'
+    + '<div class="card-actions"><button class="btn btn-primary" data-action="importJson">导入并自动筛选</button></div>'
+    + '<p class="tip" style="margin-top:10px">说明：此处为「采集结果导入」；恢复历史数据请用顶部「备份与数据管理 → 导入备份」，两者互不影响。</p>'
+    + '</div>'
+    + '<div class="panel"><h3><svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><path d="M4 17l6-6-6-6M12 19h8"/></svg>采集日志</h3>'
+    + '<div class="log-box" id="logBox"></div></div>';
+}
+
+function renderLogs(){
+  var box = document.getElementById('logBox');
+  if(!box) return;
+  if(!state.logs.length){ box.innerHTML = '<span style="opacity:.5">暂无日志</span>'; return; }
+  box.innerHTML = state.logs.slice(-80).map(function(l){
+    var cls = l.level==='error'?'err':l.level==='ok'?'ok':l.level==='warn'?'warn':'';
+    return '<div class="'+cls+'">['+esc(l.t)+'] '+esc(l.msg)+'</div>';
+  }).join('');
+  box.scrollTop = box.scrollHeight;
+}
+
+function renderCounts(){
+  document.getElementById('cntCandidate').textContent = statusVideos('candidate').filter(function(v){return !isExpired(v);}).length;
+  document.getElementById('cntReview').textContent = statusVideos('review').length;
+  document.getElementById('cntSelected').textContent = statusVideos('selected').length;
+  document.getElementById('cntRejected').textContent = statusVideos('rejected').length;
+}
+
+function emptyHtml(msg){ return '<div class="empty-state">'+msg+'</div>'; }
+
+/* 统一刷新入口 */
+function refreshAll(){
+  renderToday();
+  renderCounts();
+  document.getElementById('demoSwitch').classList.toggle('on', state.demoMode);
+  var t = state.tab;
+  if(t === 'collect'){ $panel.innerHTML = renderCollect(); renderLogs(); }
+  else if(t === 'candidate') $panel.innerHTML = renderCandidate();
+  else if(t === 'review') $panel.innerHTML = renderReview();
+  else if(t === 'selected') $panel.innerHTML = renderSelected();
+  else if(t === 'rejected') $panel.innerHTML = renderRejected();
+  else if(t === 'analysis') $panel.innerHTML = renderAnalysis();
+}
+
+/* =========================================================
+ * 业务动作
+ * ========================================================= */
+function findV(id){
+  for(var i=0;i<state.videos.length;i++) if(state.videos[i].id === id) return state.videos[i];
+  return null;
+}
+function setStatus(id, st, reasonText){
+  var v = findV(id); if(!v) return;
+  v.status = st; v.updatedAt = nowStr();
+  if(reasonText !== undefined) v.reason = reasonText;
+  if(st !== 'selected'){ v.manualOverride = false; }
+  saveData(); refreshAll();
+}
+function rawToVideo(raw){
+  var fans = parseWan(raw.fans), likes = parseWan(raw.likes), comments = parseWan(raw.comments),
+      favs = parseWan(raw.favorites), shares = parseWan(raw.shares);
+  return {
+    id: 'v' + Date.now() + Math.floor(Math.random()*10000),
+    title: raw.title || '', link: raw.link || '', author: raw.author || '未知',
+    publishTime: raw.publishTime || null, duration: raw.duration || null,
+    fans: fans.val, likes: likes.val, comments: comments.val, favorites: favs.val, shares: shares.val,
+    approx: { fans:fans.approx, likes:likes.approx, comments:comments.approx, favorites:favs.approx, shares:shares.approx },
+    contentType: raw.contentType || null, topic: raw.topic || null,
+    status: 'candidate', manualOverride:false, overrideReason:'', reason: '',
+    note: raw.note || '', transcript: raw.transcript || '',
+    analysis: raw.analysis || null,
+    isSample: false, collectedBy: raw.collectedBy || 'real',
+    createdAt: nowStr(), updatedAt: nowStr()
+  };
+}
+function classifyImported(v){
+  var chk = checkHard(v);
+  if(chk.verdict === 'review'){
+    v.status = 'review';
+    v.reason = '待复核：' + chk.reviews.join('、') + '，未获取数据不按0处理';
+  }else if(chk.verdict === 'fail'){
+    v.status = 'rejected';
+    v.reason = '淘汰：' + chk.fails.join('；');
+  }else{
+    var r = ratioOf(v);
+    v.status = 'candidate';
+    v.reason = '基础条件通过：优先级评分' + priorityScore(v) + '（赞粉比' + (r!==null?(r*100).toFixed(1):'?') + '%）';
+  }
+}
+/* 采集结果导入：同链接 → 更新（保留备注/状态/拆解）；同标题不同链接 → 新记录 */
+function importVideos(arr){
+  var added = 0, updated = 0, toReview = 0;
+  arr.forEach(function(raw){
+    if(!raw || !raw.title) return;
+    var nv = rawToVideo(raw);
+    var exist = null;
+    var cl = canonLink(nv.link);
+    if(cl) exist = state.videos.filter(function(v){ return canonLink(v.link) === cl; })[0];
+    if(!exist && nv.link === ''){
+      exist = state.videos.filter(function(v){ return v.title === nv.title && v.author === nv.author; })[0];
+    }
+    if(exist){
+      ['title','author','publishTime','duration','fans','likes','comments','favorites','shares','contentType','topic'].forEach(function(k){
+        if(nv[k] !== null && nv[k] !== '' && nv[k] !== undefined) exist[k] = nv[k];
+      });
+      if(nv.approx) exist.approx = nv.approx;
+      if(nv.transcript) exist.transcript = nv.transcript;
+      if(nv.analysis) exist.analysis = nv.analysis;
+      exist.updatedAt = nowStr();
+      if(!exist.manualOverride && exist.status !== 'selected') classifyImported(exist);
+      updated++;
+    }else{
+      classifyImported(nv);
+      if(nv.status === 'review') toReview++;
+      state.videos.push(nv);
+      added++;
+    }
+  });
+  addLog('采集导入完成：新增 '+added+' 条、更新 '+updated+' 条（其中 '+toReview+' 条新增转待复核）', added+updated>0?'ok':'warn');
+  saveData(); refreshAll();
+  return { added:added, updated:updated, toReview:toReview };
+}
+
+/* 备份：完整保留状态/备注/分析/标识/时间 */
+function makeBackup(){
+  return { app:'douyin-koubo-workbench', version:2, exportedAt: nowStr(), videos: state.videos };
+}
+function restoreBackup(data){
+  var arr = Array.isArray(data) ? data : (data && Array.isArray(data.videos) ? data.videos : null);
+  if(!arr) return { ok:false, msg:'文件不是有效备份（缺少 videos 数组）' };
+  var added = 0, replaced = 0;
+  arr.forEach(function(bv){
+    if(!bv || !bv.id) return;
+    var idx = -1;
+    for(var i=0;i<state.videos.length;i++) if(state.videos[i].id === bv.id){ idx = i; break; }
+    if(idx >= 0){ state.videos[idx] = bv; replaced++; }
+    else{ state.videos.push(bv); added++; }
+  });
+  saveData(); refreshAll();
+  return { ok:true, added:added, replaced:replaced };
+}
+
+/* 下载与导出 */
+function download(name, content, mime){
+  var blob = new Blob([content], { type: mime });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+function exportBackup(){
+  download('口播选题备份_' + nowStr().replace(/[-: ]/g,'') + '.json', JSON.stringify(makeBackup(), null, 2), 'application/json');
+  addLog('已导出备份（'+state.videos.length+' 条，含状态/备注/拆解/时间）','ok');
+  toast('备份文件已下载');
+}
+function exportCsv(){
+  var head = ['标题','抖音链接','作者','发布时间','时长','粉丝数','点赞数','评论数','收藏数','分享数','点赞粉丝比','内容类型','话题分类','筛选结论','状态','人工例外','原因','可借鉴分','数据来源','备注','最后更新'];
+  var stMap = { candidate:'今日候选', review:'待复核', selected:'已入选', rejected:'已淘汰' };
+  var rows = visibleVideos().map(function(v){
+    var chk = checkHard(v);
+    var concl = v.manualOverride ? '人工例外' : chk.verdict==='pass' ? '基础条件通过' : chk.verdict==='review' ? '待复核' : '未通过基础条件';
+    return [v.title, v.link && v.link.indexOf('demo://')!==0 ? v.link : '（模拟链接）', v.author, v.publishTime||'未获取', v.duration||'未获取',
+      v.fans===null?'未获取':v.fans, v.likes===null?'未获取':v.likes, v.comments===null?'未获取':v.comments,
+      v.favorites===null?'未获取':v.favorites, v.shares===null?'未获取':v.shares, fmtRatio(v),
+      v.contentType||'未知', v.topic||'', concl, stMap[v.status]||v.status, v.manualOverride ? '是：'+v.overrideReason : '否', v.reason||'',
+      v.analysis && v.analysis.score ? v.analysis.score : '', v.isSample?'模拟数据':v.collectedBy==='real'?'真实采集':'手动录入',
+      (v.note||'').replace(/\n/g,' '), v.updatedAt||''];
+  });
+  var csv = '﻿' + [head].concat(rows).map(function(r){
+    return r.map(function(c){ return '"'+String(c).replace(/"/g,'""')+'"'; }).join(',');
+  }).join('\r\n');
+  download('口播选题_' + nowStr().replace(/[-: ]/g,'') + '.csv', csv, 'text/csv;charset=utf-8');
+  addLog('已导出表格（'+visibleVideos().length+' 条）','ok');
+  toast('表格已下载');
+}
+
+/* 采集任务文案生成（不含任何模拟结果） */
+function buildCollectTask(){
+  var kws = [1,2,3,4].map(function(i){
+    var el = document.getElementById('kw'+i);
+    return el ? el.value.trim() : '';
+  }).filter(function(x){ return x; });
+  return '【抖音AI口播选题采集任务 · 需要 WorkBuddy 执行】\n'
+    + '请用浏览器自动化复用我已登录的抖音页面（或以远程调试模式连接我的 Chrome），按以下要求采集公开页面数据：\n'
+    + '1. 搜索关键词：' + (kws.join('；') || 'AI教程；AI工具实操；AI工作流；提示词 智能体教学') + '\n'
+    + '2. 硬条件：只采集最近14天（336小时）发布、AI教学类或AI认知类、且非剧情/短剧的内容。\n'
+    + '3. 排序优先：内容是否适合参考/改编成口播 > 真人口播 > 低粉高赞（粉丝≤10万、点赞≥1万、赞粉比≥20%） > 评论活跃（评论≥100）；AI教学/AI认知仅作分类，真人口播和互动指标均为加分项，不因未达标淘汰。\n'
+    + '4. 每条采集字段：title、link、author、publishTime、duration、fans、likes、comments、favorites、shares、contentType、topic；publishTime 使用 YYYY-MM-DD HH:mm。\n'
+    + '5. 页面显示"万"时读取精确数字（如 2.3万→23000）；关键统计拿不到时填 null，不要填 0，工作台会转待复核。\n'
+    + '6. 遇到验证码或登录验证立即暂停并告诉我，不要绕过\n'
+    + '7. 只采集公开数据与链接，不下载视频、不发布\n'
+    + '8. 结果以 JSON 数组返回，我粘贴回工作台导入';
+}
+
+/* =========================================================
+ * 弹窗控制
+ * ========================================================= */
+var modalCb = null;
+function confirmModal(title, text, cb){
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalText').textContent = text;
+  document.getElementById('modalMask').classList.add('show');
+  modalCb = cb;
+}
+var editingId = null, updatingId = null, overrideId = null;
+function openEdit(id){
+  var v = findV(id); if(!v) return;
+  editingId = id;
+  document.getElementById('f_title').value = v.title||'';
+  document.getElementById('f_link').value = v.link||'';
+  document.getElementById('f_author').value = v.author||'';
+  document.getElementById('f_publishTime').value = v.publishTime||'';
+  document.getElementById('f_duration').value = v.duration||'';
+  document.getElementById('f_fans').value = v.fans===null?'':v.fans;
+  document.getElementById('f_likes').value = v.likes===null?'':v.likes;
+  document.getElementById('f_comments').value = v.comments===null?'':v.comments;
+  document.getElementById('f_favorites').value = v.favorites===null?'':v.favorites;
+  document.getElementById('f_shares').value = v.shares===null?'':v.shares;
+  document.getElementById('f_contentType').value = v.contentType||'';
+  document.getElementById('f_topic').value = v.topic||'';
+  document.getElementById('f_transcript').value = v.transcript||'';
+  document.getElementById('editMask').classList.add('show');
+}
+function numOrNull(id){
+  var s = document.getElementById(id).value.trim();
+  if(s === '') return null;
+  var n = parseInt(s, 10);
+  return isNaN(n) ? null : n;
+}
+
+/* =========================================================
+ * 事件绑定
+ * ========================================================= */
+document.getElementById('tabs').addEventListener('click', function(e){
+  var t = e.target.closest('.tab'); if(!t) return;
+  state.tab = t.dataset.tab;
+  document.querySelectorAll('.tab').forEach(function(x){ x.classList.toggle('active', x === t); });
+  refreshAll();
+});
+document.querySelectorAll('[data-goto]').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    state.tab = btn.dataset.goto;
+    document.querySelectorAll('.tab').forEach(function(x){ x.classList.toggle('active', x.dataset.tab === state.tab); });
+    refreshAll();
+  });
+});
+document.getElementById('demoSwitch').addEventListener('click', function(){
+  state.demoMode = !state.demoMode;
+  addLog(state.demoMode ? '已开启演示模式（显示模拟数据）' : '已关闭演示模式（仅真实数据）','info');
+  saveData(); refreshAll();
+  toast(state.demoMode ? '演示模式已开启' : '演示模式已关闭，仅显示真实数据');
+});
+
+$panel.addEventListener('click', function(e){
+  var btn = e.target.closest('[data-action]'); if(!btn) return;
+  var action = btn.dataset.action;
+  if(action === 'genTask'){
+    state._taskText = buildCollectTask();
+    addLog('已生成采集任务，等待 WorkBuddy 执行（无模拟进度、无模拟结果）','warn');
+    saveData(); refreshAll();
+    return;
+  }
+  if(action === 'copyTask'){
+    var txt = document.getElementById('taskText').textContent;
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){ toast('任务已复制，发给 WorkBuddy 即可'); }, function(){ toast('复制失败，请手动选择文本复制', true); });
+    }else toast('当前浏览器不支持自动复制，请手动选择文本复制', true);
+    return;
+  }
+  if(action === 'copyLink'){
+    var lnk = btn.dataset.link || '';
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(lnk).then(function(){ toast('链接已复制，可粘贴到抖音 App 打开'); }, function(){ toast('复制失败，请手动复制：' + lnk, true); });
+    }else toast('请手动复制链接：' + lnk, true);
+    return;
+  }
+  if(action === 'importJson'){
+    var txt2 = document.getElementById('importBox').value.trim();
+    if(!txt2){ addLog('导入失败：内容为空','error'); refreshAll(); return; }
+    try{
+      var data = JSON.parse(txt2);
+      if(!Array.isArray(data)) data = [data];
+      var r = importVideos(data);
+      toast('新增 '+r.added+' 条，更新 '+r.updated+' 条');
+    }catch(err){
+      addLog('导入失败：JSON 格式错误（' + err.message + '）','error');
+      toast('JSON 格式错误', true);
+      refreshAll();
+    }
+    return;
+  }
+  if(action === 'goto'){
+    state.tab = btn.dataset.tab;
+    document.querySelectorAll('.tab').forEach(function(x){ x.classList.toggle('active', x.dataset.tab === state.tab); });
+    refreshAll(); return;
+  }
+  var card = btn.closest('.vcard'); if(!card) return;
+  var id = card.dataset.id;
+  if(action === 'select'){
+    var v0 = findV(id), chk0 = checkHard(v0);
+    if(chk0.verdict !== 'pass' && !v0.manualOverride){
+      confirmModal('未通过基础条件', '该记录未通过或未确认基础条件，直接入选将标注为「人工例外」。也可以先补全数据。', function(){
+        overrideId = id;
+        document.getElementById('overrideReason').value = '';
+        document.getElementById('overrideMask').classList.add('show');
+      });
+      return;
+    }
+    setStatus(id, 'selected', '人工确认入选：' + (v0.reason||'符合改编方向'));
+  }
+  else if(action === 'keepOverride'){
+    overrideId = id;
+    document.getElementById('overrideReason').value = '';
+    document.getElementById('overrideMask').classList.add('show');
+  }
+  else if(action === 'reject'){
+    var v = findV(id), chk = checkHard(v);
+    setStatus(id, 'rejected', chk.fails.length ? '淘汰：' + chk.fails.join('；') : '人工淘汰');
+  }
+  else if(action === 'toReview') setStatus(id, 'review');
+  else if(action === 'toCandidate') setStatus(id, 'candidate');
+  else if(action === 'edit') openEdit(id);
+  else if(action === 'updateData'){
+    updatingId = id;
+    document.getElementById('updateBox').value = '';
+    document.getElementById('updateMask').classList.add('show');
+  }
+  else if(action === 'viewAnalysis'){
+    state.tab = 'analysis';
+    document.querySelectorAll('.tab').forEach(function(x){ x.classList.toggle('active', x.dataset.tab === 'analysis'); });
+    refreshAll();
+  }
+});
+
+$panel.addEventListener('input', function(e){
+  if(e.target.id === 'searchBox'){
+    var val = e.target.value;
+    clearTimeout(e.target._t);
+    e.target._t = setTimeout(function(){ state.query = val; refreshAll(); }, 400);
+  }
+});
+$panel.addEventListener('change', function(e){
+  if(e.target.id === 'sortSel'){ state.sort = e.target.value; refreshAll(); return; }
+  var ta = e.target.closest('textarea[data-action="note"]'); if(!ta) return;
+  var card = ta.closest('.vcard'); if(!card) return;
+  var v = findV(card.dataset.id); if(!v) return;
+  v.note = ta.value; v.updatedAt = nowStr();
+  if(saveData()) toast('备注已保存');
+});
+
+/* 编辑资料保存 */
+document.getElementById('editCancel').addEventListener('click', function(){ document.getElementById('editMask').classList.remove('show'); });
+document.getElementById('editSave').addEventListener('click', function(){
+  var v = findV(editingId); if(!v) return;
+  v.title = document.getElementById('f_title').value.trim() || v.title;
+  v.link = document.getElementById('f_link').value.trim();
+  v.author = document.getElementById('f_author').value.trim() || '未知';
+  v.publishTime = document.getElementById('f_publishTime').value.trim() || null;
+  v.duration = document.getElementById('f_duration').value.trim() || null;
+  v.fans = numOrNull('f_fans'); v.likes = numOrNull('f_likes'); v.comments = numOrNull('f_comments');
+  v.favorites = numOrNull('f_favorites'); v.shares = numOrNull('f_shares');
+  v.approx = null; /* 人工录入按精确值 */
+  v.contentType = document.getElementById('f_contentType').value || null;
+  v.topic = document.getElementById('f_topic').value || null;
+  v.transcript = document.getElementById('f_transcript').value.trim();
+  v.updatedAt = nowStr();
+  if(!v.manualOverride && v.status !== 'selected') classifyImported(v);
+  document.getElementById('editMask').classList.remove('show');
+  var chk = checkHard(v);
+  addLog('已编辑「'+v.title.slice(0,20)+'」并重新筛选：' + (chk.verdict==='pass'?'基础条件通过':chk.verdict==='review'?'待复核 '+chk.reviews.length+' 项':'未通过基础条件 '+chk.fails.length+' 项'), 'ok');
+  saveData(); refreshAll();
+  if(v.transcript && !v.analysis) toast('文案已保存，可在「文案拆解」生成拆解任务');
+  else toast('已保存并重新筛选');
+});
+/* 更新数据保存 */
+document.getElementById('updateCancel').addEventListener('click', function(){ document.getElementById('updateMask').classList.remove('show'); });
+document.getElementById('updateSave').addEventListener('click', function(){
+  var v = findV(updatingId); if(!v) return;
+  var txt = document.getElementById('updateBox').value.trim();
+  try{
+    var raw = JSON.parse(txt);
+    if(Array.isArray(raw)) raw = raw[0];
+    var nv = rawToVideo(raw);
+    ['title','author','publishTime','duration','fans','likes','comments','favorites','shares','contentType','topic'].forEach(function(k){
+      if(nv[k] !== null && nv[k] !== '' && nv[k] !== undefined) v[k] = nv[k];
+    });
+    if(nv.approx) v.approx = nv.approx;
+    if(nv.transcript) v.transcript = nv.transcript;
+    if(nv.analysis) v.analysis = nv.analysis;
+    v.updatedAt = nowStr();
+    if(!v.manualOverride && v.status !== 'selected') classifyImported(v);
+    document.getElementById('updateMask').classList.remove('show');
+    addLog('已更新「'+v.title.slice(0,20)+'」的数据（备注/状态/拆解保留）','ok');
+    saveData(); refreshAll();
+    toast('数据已更新并重新筛选');
+  }catch(err){
+    toast('JSON 格式错误：' + err.message, true);
+  }
+});
+/* 人工例外保存 */
+document.getElementById('overrideCancel').addEventListener('click', function(){ document.getElementById('overrideMask').classList.remove('show'); });
+document.getElementById('overrideSave').addEventListener('click', function(){
+  var v = findV(overrideId); if(!v) return;
+  var reason = document.getElementById('overrideReason').value.trim();
+  if(!reason){ toast('请填写人工例外理由', true); return; }
+  v.status = 'selected';
+  v.manualOverride = true;
+  v.overrideReason = reason;
+  v.reason = '人工例外保留：' + reason;
+  v.updatedAt = nowStr();
+  document.getElementById('overrideMask').classList.remove('show');
+  addLog('人工例外保留「'+v.title.slice(0,20)+'」：' + reason,'warn');
+  saveData(); refreshAll();
+});
+/* 通用确认弹窗 */
+document.getElementById('modalCancel').addEventListener('click', function(){
+  document.getElementById('modalMask').classList.remove('show'); modalCb = null;
+});
+document.getElementById('modalOk').addEventListener('click', function(){
+  document.getElementById('modalMask').classList.remove('show');
+  if(modalCb){ var cb = modalCb; modalCb = null; cb(); }
+});
+
+/* 备份/表格/清空 */
+document.getElementById('btnExportBackup').addEventListener('click', exportBackup);
+document.getElementById('btnExportCsv').addEventListener('click', exportCsv);
+document.getElementById('btnImportBackup').addEventListener('click', function(){ document.getElementById('importBackupFile').click(); });
+document.getElementById('importBackupFile').addEventListener('change', function(e){
+  var f = e.target.files[0]; if(!f) return;
+  var reader = new FileReader();
+  reader.onload = function(){
+    try{
+      var data = JSON.parse(reader.result);
+      var r = restoreBackup(data);
+      if(r.ok){
+        addLog('备份恢复完成：更新 '+r.replaced+' 条、新增 '+r.added+' 条（状态/备注/拆解/时间已保留）','ok');
+        toast('备份已恢复：更新 '+r.replaced+' 条、新增 '+r.added+' 条');
+      }else{
+        addLog('备份恢复失败：'+r.msg,'error');
+        toast(r.msg, true);
+      }
+    }catch(err){
+      addLog('备份恢复失败：文件不是有效 JSON','error');
+      toast('文件不是有效 JSON', true);
+    }
+  };
+  reader.readAsText(f);
+  e.target.value = '';
+});
+document.getElementById('btnClearSample').addEventListener('click', function(){
+  confirmModal('清空演示数据', '将删除全部模拟演示记录，真实采集的数据不受影响。确定继续？', function(){
+    state.videos = state.videos.filter(function(v){ return !v.isSample; });
+    addLog('已清空演示数据','ok'); saveData(); refreshAll();
+  });
+});
+document.getElementById('btnClearAll').addEventListener('click', function(){
+  confirmModal('清空全部数据', '将删除全部 '+state.videos.length+' 条记录且不可恢复！建议先导出备份。确定继续？', function(){
+    state.videos = []; addLog('已清空全部数据','warn'); saveData(); refreshAll();
+  });
+});
+
+/* =========================================================
+ * 初始化
+ * ========================================================= */
+document.addEventListener('DOMContentLoaded', function(){
+  loadData();
+  recheckFreshness();
+  addLog('工作台已打开，真实记录 ' + state.videos.filter(function(v){return !v.isSample;}).length + ' 条，演示记录 ' + state.videos.filter(function(v){return v.isSample;}).length + ' 条','info');
+  refreshAll();
+});
+</script>
+</body>
+</html>
