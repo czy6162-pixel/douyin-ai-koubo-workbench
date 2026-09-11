@@ -381,10 +381,10 @@ function parsePubTime(s){
   if(!m) return null;
   var y=+m[1], mo=+m[2], d=+m[3], h=m[4]?+m[4]:0, mi=m[5]?+m[5]:0;
   if(mo<1||mo>12||d<1||d>31||h>23||mi>59) return null;
-  var t = Date.UTC(y, mo-1, d, h-8, mi); /* 北京时间 → UTC */
-  var chk = new Date(t);
-  if(chk.getUTCMonth() !== mo-1) return null;
-  return t;
+  var local = Date.UTC(y, mo-1, d, h, mi);
+  var chk = new Date(local);
+  if(chk.getUTCFullYear() !== y || chk.getUTCMonth() !== mo-1 || chk.getUTCDate() !== d || chk.getUTCHours() !== h || chk.getUTCMinutes() !== mi) return null;
+  return local - 8*3600000; /* 北京时间 → UTC */
 }
 /* 小时差：>=0 已发布，<0 未来时间，null 无效 */
 function ageHours(v){
